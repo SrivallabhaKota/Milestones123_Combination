@@ -1,0 +1,147 @@
+{% extends "layout.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="auth-container">
+
+    <!-- ══ Flash Messages ══════════════════════════════════ -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-3" role="alert" aria-live="polite">
+          {% for category, message in messages %}
+            <div class="alert-custom alert-{{ category }}" id="flash-{{ loop.index }}">
+              <i class="bi
+                {% if category == 'success' %}bi-check-circle-fill
+                {% elif category == 'danger'  %}bi-exclamation-circle-fill
+                {% elif category == 'warning' %}bi-exclamation-triangle-fill
+                {% else %}bi-info-circle-fill{% endif %}">
+              </i>
+              <span>{{ message }}</span>
+              <button type="button" class="alert-close ms-auto"
+                      style="background:none;border:none;color:inherit;cursor:pointer;font-size:1rem;"
+                      aria-label="Close alert">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- ══ Glass Card ══════════════════════════════════════ -->
+    <div class="glass-card">
+
+      <!-- Brand Logo -->
+      <div class="brand-logo">
+        <div class="brand-icon" aria-hidden="true">📊</div>
+        <div class="brand-text">
+          <span class="brand-name">FinSight</span>
+          <span class="brand-tagline">Finance Intelligence</span>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h1 class="auth-title">Welcome Back 👋</h1>
+      <p class="auth-subtitle">Sign in to your FinSight account to continue</p>
+
+      <div class="auth-divider"></div>
+
+      <!-- ══ Login Form ════════════════════════════════════ -->
+      <form id="login-form"
+            action="{{ url_for('login_page') }}"
+            method="POST"
+            novalidate>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <div class="input-wrapper">
+            <i class="bi bi-envelope-fill input-icon"></i>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control-custom"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+              aria-label="Email address"
+              aria-required="true"
+            />
+          </div>
+          <div id="email-validation-msg" class="validation-msg" aria-live="polite"></div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-wrapper has-right-icon">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control-custom"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+              aria-label="Password"
+              aria-required="true"
+            />
+            <button
+              type="button"
+              id="toggle-password"
+              class="password-toggle"
+              title="Show password"
+              aria-label="Toggle password visibility">
+              <i class="bi bi-eye-fill"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me + Forgot Password -->
+        <div class="d-flex align-items-center justify-content-between mb-4 mt-1">
+          <label class="custom-check" for="remember">
+            <input type="checkbox" id="remember" name="remember" />
+            <span>Remember me</span>
+          </label>
+          <a href="{{ url_for('forgot_password') }}"
+             class="forgot-link"
+             aria-label="Forgot password?">
+            Forgot password?
+          </a>
+        </div>
+
+        <!-- Login Button -->
+        <button
+          type="submit"
+          id="login-btn"
+          class="btn-primary-custom"
+          aria-label="Sign in to FinSight">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+        </button>
+
+      </form>
+
+      <!-- ── Divider ──────────────────────────────────────── -->
+      <div class="auth-divider my-4"></div>
+
+      <!-- Create Account Button -->
+      <a href="{{ url_for('register') }}"
+         id="create-account-btn"
+         class="btn-outline-custom"
+         aria-label="Create a new FinSight account">
+        <i class="bi bi-person-plus-fill me-2"></i>Create New Account
+      </a>
+
+    </div><!-- /glass-card -->
+
+    <!-- Footer -->
+    <p class="auth-footer mt-3">
+      &copy; 2024 FinSight. Made with ❤️ for your financial future.
+    </p>
+
+  </div><!-- /auth-container -->
+</div><!-- /page-wrapper -->
+{% endblock %}
