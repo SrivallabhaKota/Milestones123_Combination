@@ -1,724 +1,332 @@
-{% extends "layout.html" %}
-{% block title %}Dashboard{% endblock %}
+<!doctype html>
+<!-- FinSight – dashboard.html | Dashboard & Financial Analytics Module | Module Lead: Monisha -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FinSight – Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- Dashboard-specific CSS (does not affect login/register/home themes) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  </head>
+  <body>
+    <div class="d-flex">
 
-{% block extra_head %}
-<style>
-  /* Dashboard-only overrides */
-  body { cursor: auto; }
-  #cursor, #cursor-ring { display: none; }
-
-  .dash-main { min-height: calc(100vh - 70px); position: relative; z-index: 1; }
-
-  /* ── Progress Bar Widget ── */
-  .progress-custom {
-    height: 8px;
-    border-radius: 99px;
-    background: rgba(255,255,255,0.08);
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    border-radius: 99px;
-    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  /* ── Mini Chart Bars ── */
-  .mini-chart {
-    display: flex;
-    align-items: flex-end;
-    gap: 4px;
-    height: 40px;
-  }
-  .mini-bar {
-    flex: 1;
-    border-radius: 3px 3px 0 0;
-    min-width: 8px;
-    animation: barGrow 1s ease both;
-  }
-  @keyframes barGrow {
-    from { transform: scaleY(0); transform-origin: bottom; }
-    to   { transform: scaleY(1); }
-  }
-
-  /* ── Quick Action Buttons ── */
-  .quick-action-btn {
-    background: var(--bg-card);
-    border: 1px solid var(--border-glass);
-    border-radius: var(--radius-md);
-    padding: 0.85rem 1rem;
-    color: var(--text-secondary);
-    font-family: var(--font-primary);
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-normal);
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    text-decoration: none;
-    width: 100%;
-  }
-  .quick-action-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary-light);
-    background: rgba(108,99,255,0.08);
-    transform: translateY(-2px);
-  }
-  .quick-action-icon {
-    width: 36px; height: 36px;
-    border-radius: var(--radius-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-
-  /* ── Goal Progress ── */
-  .goal-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-glass);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
-    margin-bottom: 0.75rem;
-    transition: var(--transition-normal);
-  }
-  .goal-card:hover {
-    border-color: rgba(108,99,255,0.35);
-    background: var(--bg-card-hover);
-  }
-  .goal-title { font-size:0.88rem; font-weight:600; color:var(--text-primary); }
-  .goal-amount {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-family: var(--font-body);
-  }
-
-  /* ── Responsive table ── */
-  @media(max-width:768px) {
-    .dash-hero-title { font-size: 1.4rem; }
-  }
-</style>
-{% endblock %}
-
-{% block content %}
-
-<!-- ══ Navbar ════════════════════════════════════════════════ -->
-<nav class="dash-navbar" role="navigation" aria-label="Main navigation">
-  <div class="container-xl">
-    <div class="d-flex align-items-center justify-content-between">
-
-      <!-- Brand -->
-      <a href="{{ url_for('dashboard') }}" class="navbar-brand-custom" aria-label="FinSight Home">
-        📊 FinSight
-      </a>
-
-      <!-- Right Side -->
-      <div class="d-flex align-items-center gap-3">
-        <!-- User Info -->
-        <div class="d-flex align-items-center gap-2">
-          <div class="user-avatar" aria-hidden="true">
-            {{ user_name[0].upper() }}
-          </div>
-          <div class="d-none d-sm-block">
-            <div class="dash-welcome-text">Logged in as</div>
-            <div class="dash-user-name">{{ user_name }}</div>
+      <!-- ══ Sidebar ════════════════════════════════════════════ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="logo-row">
+          <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="FinSight Logo" class="dash-nav-logo-img" style="width: 42px; height: 42px;">
+          <div class="logo-text">
+            <h3>FinSight</h3>
+            <small>Smart. Secure. Simple.</small>
           </div>
         </div>
 
-        <!-- Logout -->
-        <a href="{{ url_for('logout') }}"
-           id="logout-btn"
-           class="btn-logout"
-           aria-label="Logout from FinSight">
-          <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-          <span class="d-none d-sm-inline">Logout</span>
-        </a>
-      </div>
+        <nav class="nav-list">
+          <a href="{{ url_for('dashboard') }}" class="nav-item active">
+            <i class="bi bi-grid"></i><span>Dashboard</span>
+          </a>
+          <!-- Expense Management: goes to Add Expense form (Deepika module) -->
+          <a href="{{ url_for('add_expense') }}" class="nav-item">
+            <i class="bi bi-wallet2"></i><span>Expense Management</span>
+          </a>
+          <!-- Budget Management: goes to Create Budget form (Deepika module) -->
+          <a href="{{ url_for('add_budget') }}" class="nav-item">
+            <i class="bi bi-pie-chart"></i><span>Budget Management</span>
+          </a>
+          <!-- Investment Tracking: goes to Add Income form (Navaneeth / Deepika module) -->
+          <a href="{{ url_for('add_income') }}" class="nav-item">
+            <i class="bi bi-graph-up-arrow"></i><span>Investment Tracking</span>
+          </a>
+          <!-- Financial Goals: placeholder redirects back to dashboard -->
+          <a href="{{ url_for('dashboard') }}" class="nav-item">
+            <i class="bi bi-bullseye"></i><span>Financial Goals</span>
+          </a>
+          <!-- Reports: placeholder redirects back to dashboard -->
+          <a href="{{ url_for('dashboard') }}" class="nav-item">
+            <i class="bi bi-file-earmark-bar-graph"></i><span>Reports</span>
+          </a>
+        </nav>
 
-    </div>
-  </div>
-</nav>
-
-<!-- ══ Flash Messages ════════════════════════════════════════ -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="container-xl pt-3" role="alert" aria-live="polite">
-      {% for category, message in messages %}
-        <div class="alert-custom alert-{{ category }}" id="flash-{{ loop.index }}">
-          <i class="bi
-            {% if category == 'success' %}bi-check-circle-fill
-            {% elif category == 'danger'  %}bi-exclamation-circle-fill
-            {% elif category == 'warning' %}bi-exclamation-triangle-fill
-            {% else %}bi-info-circle-fill{% endif %}">
-          </i>
-          <span>{{ message }}</span>
-          <button type="button" class="alert-close ms-auto"
-                  style="background:none;border:none;color:inherit;cursor:pointer;font-size:1rem;"
-                  aria-label="Close">
-            <i class="bi bi-x-lg"></i>
-          </button>
+        <div class="sidebar-promo">
+          <h6><i class="bi bi-star-fill text-warning"></i> Upgrade to Pro</h6>
+          <p>Unlock advanced analytics, custom reports and more.</p>
+          <!-- Upgrade Now: links to Add Income form as a placeholder -->
+          <a class="btn btn-primary" href="{{ url_for('add_income') }}">Upgrade Now</a>
         </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
+      </aside>
 
-<!-- ══ Dashboard Main ════════════════════════════════════════ -->
-<main class="dash-main py-4" aria-label="Dashboard main content">
-  <div class="container-xl">
+      <!-- ══ Main Panel ════════════════════════════════════════ -->
+      <main class="main-panel">
 
-    <!-- ── Hero Section ────────────────────────────────────── -->
-    <div class="dash-hero mb-4">
-      <div class="row align-items-center">
-        <div class="col-lg-7">
-          <div class="dash-hero-greeting">
-            <i class="bi bi-stars me-1"></i>
-            Good {{ 'Morning' if now_hour < 12 else ('Afternoon' if now_hour < 17 else 'Evening') }}!
-          </div>
-          <h1 class="dash-hero-title">
-            Welcome, <span>{{ user_name.split()[0] }}</span> 👋
-          </h1>
-          <p class="dash-hero-sub">
-            <span id="typing-text" aria-live="polite"></span>
-            <span class="typing-cursor" aria-hidden="true"></span>
-          </p>
-          <div class="mt-3">
-            <small style="font-family:var(--font-body);color:var(--text-muted);font-size:0.8rem;">
-              <i class="bi bi-envelope me-1"></i>{{ user_email }}
-            </small>
-          </div>
-        </div>
-        <div class="col-lg-5 text-end d-none d-lg-block">
-          <div style="font-size:5rem;opacity:0.15;line-height:1;">📊</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Settings / Toggles Panel ────────────────────────── -->
-    <div class="settings-panel" id="settings-panel">
-      <div class="row g-0">
-
-        <!-- Privacy Mode -->
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="settings-row">
-            <div class="settings-info">
-              <div class="settings-title">🔒 Privacy Mode</div>
-              <div class="settings-desc">Blur all amounts</div>
-            </div>
-            <label class="fs-toggle v-red" for="toggle-privacy" title="Toggle privacy mode">
-              <input type="checkbox" id="toggle-privacy" onchange="togglePrivacy(this)" />
-              <div class="fs-toggle-track"><div class="fs-toggle-thumb"></div></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Notifications -->
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="settings-row">
-            <div class="settings-info">
-              <div class="settings-title">🔔 Notifications</div>
-              <div class="settings-desc">Budget & expense alerts</div>
-            </div>
-            <label class="fs-toggle v-green" for="toggle-notif" title="Toggle notifications">
-              <input type="checkbox" id="toggle-notif" checked onchange="toggleSetting(this,'Notifications')" />
-              <div class="fs-toggle-track"><div class="fs-toggle-thumb"></div></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Budget Alerts -->
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="settings-row">
-            <div class="settings-info">
-              <div class="settings-title">⚠️ Budget Alerts</div>
-              <div class="settings-desc">Warn when over budget</div>
-            </div>
-            <label class="fs-toggle v-gold" for="toggle-budget" title="Toggle budget alerts">
-              <input type="checkbox" id="toggle-budget" checked onchange="toggleSetting(this,'Budget Alerts')" />
-              <div class="fs-toggle-track"><div class="fs-toggle-thumb"></div></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Live Prices -->
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="settings-row">
-            <div class="settings-info">
-              <div class="settings-title">📡 Live Prices</div>
-              <div class="settings-desc">Real-time market data</div>
-            </div>
-            <label class="fs-toggle v-blue" for="toggle-live" title="Toggle live prices">
-              <input type="checkbox" id="toggle-live" onchange="toggleSetting(this,'Live Prices')" />
-              <div class="fs-toggle-track"><div class="fs-toggle-thumb"></div></div>
-            </label>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── Stats Cards ──────────────────────────────────────── -->
-    <div class="row g-3 mb-4">
-
-      <!-- Monthly Expenses -->
-      <div class="col-6 col-lg-3">
-        <div class="stat-card"
-             style="--card-accent-color:linear-gradient(90deg,#ff4d6d,#ff6b87);
-                    --card-glow-color:rgba(255,77,109,0.2);
-                    --card-border-color:rgba(255,77,109,0.3);
-                    --card-icon-bg:rgba(255,77,109,0.15);">
-          <div class="stat-card-icon">💸</div>
-          <div class="stat-label">Monthly Expenses</div>
-          <div class="stat-value">
-            ₹<span class="prv" data-count="24650" data-prefix="" data-suffix="" data-decimals="0">0</span>
-          </div>
-          <div class="stat-change down">
-            <i class="bi bi-arrow-up-right"></i> 8.3% vs last month
-          </div>
-        </div>
-      </div>
-
-      <!-- Monthly Income -->
-      <div class="col-6 col-lg-3">
-        <div class="stat-card"
-             style="--card-accent-color:linear-gradient(90deg,#00d4aa,#00ffcc);
-                    --card-glow-color:rgba(0,212,170,0.2);
-                    --card-border-color:rgba(0,212,170,0.3);
-                    --card-icon-bg:rgba(0,212,170,0.15);">
-          <div class="stat-card-icon">💰</div>
-          <div class="stat-label">Monthly Income</div>
-          <div class="stat-value">
-            ₹<span class="prv" data-count="68000" data-prefix="" data-suffix="" data-decimals="0">0</span>
-          </div>
-          <div class="stat-change up">
-            <i class="bi bi-arrow-up-right"></i> 12% vs last month
-          </div>
-        </div>
-      </div>
-
-      <!-- Total Savings -->
-      <div class="col-6 col-lg-3">
-        <div class="stat-card"
-             style="--card-accent-color:linear-gradient(90deg,#6c63ff,#a855f7);
-                    --card-glow-color:rgba(108,99,255,0.2);
-                    --card-border-color:rgba(108,99,255,0.3);
-                    --card-icon-bg:rgba(108,99,255,0.15);">
-          <div class="stat-card-icon">🏦</div>
-          <div class="stat-label">Total Savings</div>
-          <div class="stat-value">
-            ₹<span class="prv" data-count="1.85" data-prefix="" data-suffix="L" data-decimals="2">0</span>
-          </div>
-          <div class="stat-change up">
-            <i class="bi bi-arrow-up-right"></i> 5.2% this quarter
-          </div>
-        </div>
-      </div>
-
-      <!-- Investment Portfolio -->
-      <div class="col-6 col-lg-3">
-        <div class="stat-card"
-             style="--card-accent-color:linear-gradient(90deg,#ffd700,#ffed4e);
-                    --card-glow-color:rgba(255,215,0,0.15);
-                    --card-border-color:rgba(255,215,0,0.3);
-                    --card-icon-bg:rgba(255,215,0,0.12);">
-          <div class="stat-card-icon">📈</div>
-          <div class="stat-label">Investments</div>
-          <div class="stat-value">
-            ₹<span class="prv" data-count="4.2" data-prefix="" data-suffix="L" data-decimals="1">0</span>
-          </div>
-          <div class="stat-change up">
-            <i class="bi bi-arrow-up-right"></i> 18.7% returns
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /row stats -->
-
-    <!-- ── Middle Row ─────────────────────────────────────── -->
-    <div class="row g-3 mb-4">
-
-      <!-- Recent Transactions -->
-      <div class="col-lg-8">
-        <div class="section-header">
-          <div class="dash-section-title" style="margin-bottom:0">
-            <i class="bi bi-clock-history" aria-hidden="true"></i>
-            Recent Transactions
-          </div>
-          <button class="section-collapse-btn" onclick="collapseSection('txn-content',this)" title="Toggle section" aria-label="Collapse transactions">
-            <i class="bi bi-chevron-down"></i>
-          </button>
-        </div>
-        <div class="section-content" id="txn-content">
-        <div class="dash-table-wrapper">
-          <table class="dash-table" aria-label="Recent financial transactions">
-            <thead>
-              <tr>
-                <th scope="col">Description</th>
-                <th scope="col">Category</th>
-                <th scope="col">Date</th>
-                <th scope="col" class="text-end">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div style="font-weight:600;color:var(--text-primary);font-size:0.88rem;">Salary Credit</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted);">HDFC Bank</div>
-                </td>
-                <td><span class="txn-type-badge badge-income"><i class="bi bi-arrow-down-circle"></i> Income</span></td>
-                <td>Jul 28, 2024</td>
-                <td class="text-end" style="color:var(--success);font-weight:700;">+₹68,000</td>
-              </tr>
-              <tr>
-                <td>
-                  <div style="font-weight:600;color:var(--text-primary);font-size:0.88rem;">Grocery Shopping</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted);">BigBasket</div>
-                </td>
-                <td><span class="txn-type-badge badge-expense"><i class="bi bi-arrow-up-circle"></i> Expense</span></td>
-                <td>Jul 27, 2024</td>
-                <td class="text-end" style="color:var(--danger);font-weight:700;">-₹3,450</td>
-              </tr>
-              <tr>
-                <td>
-                  <div style="font-weight:600;color:var(--text-primary);font-size:0.88rem;">SIP – Mutual Fund</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted);">Zerodha Coin</div>
-                </td>
-                <td><span class="txn-type-badge badge-invest"><i class="bi bi-graph-up-arrow"></i> Investment</span></td>
-                <td>Jul 25, 2024</td>
-                <td class="text-end" style="color:var(--primary-light);font-weight:700;">-₹10,000</td>
-              </tr>
-              <tr>
-                <td>
-                  <div style="font-weight:600;color:var(--text-primary);font-size:0.88rem;">Electricity Bill</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted);">BESCOM</div>
-                </td>
-                <td><span class="txn-type-badge badge-expense"><i class="bi bi-arrow-up-circle"></i> Expense</span></td>
-                <td>Jul 22, 2024</td>
-                <td class="text-end" style="color:var(--danger);font-weight:700;">-₹1,820</td>
-              </tr>
-              <tr>
-                <td>
-                  <div style="font-weight:600;color:var(--text-primary);font-size:0.88rem;">Freelance Project</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted);">Client Payment</div>
-                </td>
-                <td><span class="txn-type-badge badge-income"><i class="bi bi-arrow-down-circle"></i> Income</span></td>
-                <td>Jul 20, 2024</td>
-                <td class="text-end" style="color:var(--success);font-weight:700;">+₹15,500</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        </div><!-- /section-content txn -->
-      </div>
-
-      <!-- Quick Actions + Savings Goals -->
-      <div class="col-lg-4">
-
-        <!-- Quick Actions -->
-        <div class="section-header">
-          <div class="dash-section-title" style="margin-bottom:0">
-            <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
-            Quick Actions
-          </div>
-          <button class="section-collapse-btn" onclick="collapseSection('qa-content',this)" title="Toggle section" aria-label="Collapse quick actions">
-            <i class="bi bi-chevron-down"></i>
-          </button>
-        </div>
-        <div class="section-content" id="qa-content">
-        <div class="d-flex flex-column gap-2 mb-4">
-          <button class="quick-action-btn" type="button" onclick="showComingSoon(this)" aria-label="Add expense">
-            <div class="quick-action-icon" style="background:rgba(255,77,109,0.15);">💸</div>
-            Add Expense
-          </button>
-          <button class="quick-action-btn" type="button" onclick="showComingSoon(this)" aria-label="Add income">
-            <div class="quick-action-icon" style="background:rgba(0,212,170,0.15);">💰</div>
-            Add Income
-          </button>
-          <button class="quick-action-btn" type="button" onclick="showComingSoon(this)" aria-label="Invest now">
-            <div class="quick-action-icon" style="background:rgba(108,99,255,0.15);">📈</div>
-            Invest Now
-          </button>
-          <button class="quick-action-btn" type="button" onclick="showComingSoon(this)" aria-label="View reports">
-            <div class="quick-action-icon" style="background:rgba(255,215,0,0.12);">📊</div>
-            View Reports
-          </button>
-        </div>
-        </div><!-- /section-content qa -->
-
-        <!-- Savings Goals -->
-        <div class="section-header">
-          <div class="dash-section-title" style="margin-bottom:0">
-            <i class="bi bi-bullseye" aria-hidden="true"></i>
-            Savings Goals
-          </div>
-          <button class="section-collapse-btn" onclick="collapseSection('goals-content',this)" title="Toggle section" aria-label="Collapse savings goals">
-            <i class="bi bi-chevron-down"></i>
-          </button>
-        </div>
-        <div class="section-content" id="goals-content">
-
-        <div class="goal-card">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="goal-title">🏠 New House Fund</div>
-            <div class="goal-amount">₹4.2L / ₹10L</div>
-          </div>
-          <div class="progress-custom">
-            <div class="progress-fill"
-                 style="width:42%;background:linear-gradient(90deg,#6c63ff,#a855f7);"
-                 role="progressbar" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100">
-            </div>
-          </div>
-          <small style="color:var(--text-muted);font-size:0.72rem;font-family:var(--font-body);">42% achieved</small>
-        </div>
-
-        <div class="goal-card">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="goal-title">✈️ Europe Trip</div>
-            <div class="goal-amount">₹85K / ₹1.5L</div>
-          </div>
-          <div class="progress-custom">
-            <div class="progress-fill"
-                 style="width:57%;background:linear-gradient(90deg,#00d4aa,#00ffcc);"
-                 role="progressbar" aria-valuenow="57" aria-valuemin="0" aria-valuemax="100">
-            </div>
-          </div>
-          <small style="color:var(--text-muted);font-size:0.72rem;font-family:var(--font-body);">57% achieved</small>
-        </div>
-
-        <div class="goal-card">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="goal-title">📱 New MacBook</div>
-            <div class="goal-amount">₹72K / ₹1.2L</div>
-          </div>
-          <div class="progress-custom">
-            <div class="progress-fill"
-                 style="width:60%;background:linear-gradient(90deg,#ffd700,#ffed4e);"
-                 role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
-            </div>
-          </div>
-          <small style="color:var(--text-muted);font-size:0.72rem;font-family:var(--font-body);">60% achieved</small>
-        </div>
-        </div><!-- /section-content goals -->
-
-      </div>
-    </div><!-- /middle row -->
-
-    <!-- ── Bottom Row: Budget + Mini Charts ──────────────── -->
-    <div class="row g-3 mb-5">
-
-      <!-- Budget Overview -->
-      <div class="col-lg-6">
-        <div class="glass-card" style="padding:1.75rem;">
-          <div class="section-header mb-0">
-            <div class="dash-section-title" style="margin-bottom:0">
-              <i class="bi bi-pie-chart-fill" aria-hidden="true"></i>
-              Budget Overview – July 2024
-            </div>
-            <button class="section-collapse-btn" onclick="collapseSection('budget-content',this)" title="Toggle section" aria-label="Collapse budget overview">
-              <i class="bi bi-chevron-down"></i>
+        <!-- ── Topbar ──────────────────────────────────────── -->
+        <div class="topbar">
+          <div class="topbar-left">
+            <button class="hamburger" type="button"
+                    onclick="document.getElementById('sidebar').classList.toggle('open')">
+              <i class="bi bi-list"></i>
             </button>
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search anything...">
+              <span class="shortcut">Ctrl+K</span>
+            </div>
           </div>
-          <div class="section-content mt-3" id="budget-content">
-          <div class="d-flex flex-column gap-3">
-            {% set budgets = [
-              ('Housing & Rent', '35,000', 85, 'linear-gradient(90deg,#ff4d6d,#ff6b87)'),
-              ('Food & Groceries', '8,200', 60, 'linear-gradient(90deg,#ffd700,#ffed4e)'),
-              ('Transport', '3,400', 45, 'linear-gradient(90deg,#17c3b2,#00d4aa)'),
-              ('Entertainment', '2,100', 30, 'linear-gradient(90deg,#a855f7,#6c63ff)'),
-              ('Healthcare', '1,800', 20, 'linear-gradient(90deg,#00d4aa,#00ffcc)'),
-            ] %}
-            {% for name, amount, pct, grad in budgets %}
-            <div>
-              <div class="d-flex justify-content-between mb-1">
-                <span style="font-family:var(--font-body);font-size:0.84rem;color:var(--text-secondary);">{{ name }}</span>
-                <span style="font-family:var(--font-body);font-size:0.84rem;font-weight:600;color:var(--text-primary);">₹{{ amount }}</span>
+          <div class="topbar-right">
+            <div class="topbar-pill"><i class="bi bi-command"></i>Ctrl+K</div>
+            <div class="icon-badge"><i class="bi bi-bell"></i><span class="badge-dot red"></span></div>
+            <div class="icon-badge"><i class="bi bi-chat-left-text"></i><span class="badge-dot purple"></span></div>
+            <div class="calendar-badge">
+              <i class="bi bi-calendar3"></i>
+              <div class="date-block">
+                <strong id="topbar-date">–</strong>
+                <span id="topbar-day">–</span>
               </div>
-              <div class="progress-custom">
-                <div class="progress-fill"
-                     style="width:{{ pct }}%;background:{{ grad }};"
-                     role="progressbar"
-                     aria-valuenow="{{ pct }}"
-                     aria-valuemin="0"
-                     aria-valuemax="100"
-                     aria-label="{{ name }} budget usage">
+            </div>
+            <div class="icon-badge"><i class="bi bi-gear"></i></div>
+            <div class="vr"></div>
+            <!-- Logged-in user from Flask session -->
+            <div class="profile-chip">
+              <div class="avatar" id="topbar-avatar">{{ user_name[0].upper() if user_name else 'U' }}</div>
+              <div class="profile-name">
+                <strong data-profile-name>{{ user_name }}</strong>
+                <span>Premium User</span>
+              </div>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+            <!-- Logout -->
+            <a href="{{ url_for('logout') }}" class="topbar-logout" id="logout-btn"
+               aria-label="Logout from FinSight">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+          </div>
+        </div>
+
+        <!-- ── Content ─────────────────────────────────────── -->
+        <div class="content-stack">
+
+          <!-- Stat Cards -->
+          <section class="stat-row">
+            <div class="stat-card blue" data-card="income">
+              <div>
+                <div class="label">Income</div>
+                <div class="amount">₹50,000</div>
+                <div class="change">↑ 12% vs last month</div>
+              </div>
+              <div class="stat-icon"><i class="bi bi-briefcase"></i></div>
+            </div>
+            <div class="stat-card orange" data-card="expenses">
+              <div>
+                <div class="label">Expenses</div>
+                <div class="amount">₹20,000</div>
+                <div class="change">↓ 4% vs last month</div>
+              </div>
+              <div class="stat-icon"><i class="bi bi-cart3"></i></div>
+            </div>
+            <div class="stat-card teal" data-card="savings">
+              <div>
+                <div class="label">Savings</div>
+                <div class="amount">₹30,000</div>
+                <div class="change">↑ 8% vs last month</div>
+              </div>
+              <div class="stat-icon"><i class="bi bi-piggy-bank"></i></div>
+            </div>
+            <div class="stat-card purple" data-card="investments">
+              <div>
+                <div class="label">Investments</div>
+                <div class="amount">₹15,000</div>
+                <div class="change">↑ 15% vs last month</div>
+              </div>
+              <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            </div>
+          </section>
+
+          <!-- Profile + Analytics -->
+          <section class="dashboard-grid">
+            <article class="panel profile-card">
+              <div class="badge-row">
+                <div class="badge-pill gold"><i class="bi bi-star-fill"></i> Premium User</div>
+                <div class="badge-pill green"><span class="bi bi-circle-fill"></span> Active</div>
+              </div>
+              <div class="profile-hero">
+                <div class="profile-avatar">
+                  {{ user_name[0].upper() if user_name else 'U' }}
+                  <span class="verified"><i class="bi bi-check"></i></span>
+                </div>
+                <div class="profile-meta">
+                  <h2 data-profile-name>{{ user_name }}</h2>
+                  <p>Premium Finance Member</p>
                 </div>
               </div>
-            </div>
-            {% endfor %}
-          </div>
-          </div><!-- /section-content budget -->
-        </div>
-      </div>
-
-      <!-- Monthly Trend -->
-      <div class="col-lg-6">
-        <div class="glass-card" style="padding:1.75rem;">
-          <div class="section-header mb-0">
-            <div class="dash-section-title" style="margin-bottom:0">
-              <i class="bi bi-bar-chart-fill" aria-hidden="true"></i>
-              Expense Trend (Last 7 Days)
-            </div>
-            <button class="section-collapse-btn" onclick="collapseSection('trend-content',this)" title="Toggle section" aria-label="Collapse expense trend">
-              <i class="bi bi-chevron-down"></i>
-            </button>
-          </div>
-          <div class="section-content mt-3" id="trend-content">
-          <div aria-label="Expense trend chart for last 7 days" role="img">
-            <div class="mini-chart mb-2">
-              {% set days = [('Mon',65), ('Tue',40), ('Wed',80), ('Thu',30), ('Fri',90), ('Sat',55), ('Sun',70)] %}
-              {% for day, h in days %}
-              <div class="mini-bar"
-                   style="height:{{ h }}%;
-                          background:linear-gradient(to top,rgba(108,99,255,0.8),rgba(0,212,170,0.6));
-                          animation-delay:{{ loop.index0 * 0.1 }}s;"
-                   title="{{ day }}: ₹{{ h * 200 }}">
+              <div class="health-score-box">
+                <div class="health-score-left">
+                  <small>Financial Health Score</small>
+                  <strong data-health-score>86/100</strong>
+                </div>
+                <div class="health-score-right">
+                  <div class="health-score-pill">Excellent</div>
+                  <div class="health-score-icon"><i class="bi bi-heart"></i></div>
+                </div>
               </div>
-              {% endfor %}
-            </div>
-            <div class="d-flex justify-content-between">
-              {% for day, h in days %}
-              <div style="font-family:var(--font-body);font-size:0.68rem;color:var(--text-muted);text-align:center;flex:1;">
-                {{ day }}
+              <div class="info-grid">
+                <div class="info-cell">
+                  <small>Email</small>
+                  <strong data-profile-email>{{ user_email }}</strong>
+                </div>
+                <div class="info-cell">
+                  <small>Role</small>
+                  <strong data-profile-role>Premium User</strong>
+                </div>
+                <div class="info-cell">
+                  <small>Member Since</small>
+                  <strong data-profile-member>–</strong>
+                </div>
+                <div class="info-cell">
+                  <small>Account Status</small>
+                  <strong data-profile-status>Verified ✓</strong>
+                </div>
               </div>
-              {% endfor %}
+            </article>
+
+            <article class="panel">
+              <div class="panel-title-row">
+                <h4>Financial Analytics</h4>
+                <div class="dropdown">
+                  <button class="dropdown-chip dropdown-toggle" type="button"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                    This Month <i class="bi bi-chevron-down"></i>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">This Month</a></li>
+                    <li><a class="dropdown-item" href="#">Last Month</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="analytics-body">
+                <div class="chart-wrapper">
+                  <canvas id="analyticsChart" width="230" height="230"></canvas>
+                </div>
+                <div class="legend-list"></div>
+              </div>
+              <div class="footer-strip">
+                <div class="summary-pill"><i class="bi bi-wallet2"></i>You saved ₹10,000 more than last month</div>
+                <!-- View Detailed Report: redirects to dashboard (placeholder) -->
+                <a class="link-blue" href="{{ url_for('dashboard') }}">View Detailed Report →</a>
+              </div>
+            </article>
+          </section>
+
+          <!-- Monthly Spending + Transactions + Insights -->
+          <section class="three-col">
+            <article class="panel chart-card">
+              <div class="panel-title-row">
+                <h4>Monthly Spending Overview</h4>
+                <div class="dropdown">
+                  <button class="dropdown-chip dropdown-toggle" type="button"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                    Last 7 Months <i class="bi bi-chevron-down"></i>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Last 7 Months</a></li>
+                    <li><a class="dropdown-item" href="#">Last 12 Months</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="line-chart-box">
+                <div class="line-chart-tooltip">Peak: ₹24,000</div>
+                <canvas id="spendingChart"></canvas>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-title-row">
+                <h4>Recent Transactions</h4>
+                <!-- View All Transactions: links to Add Expense for now -->
+                <a class="link-blue" href="{{ url_for('add_expense') }}">View All →</a>
+              </div>
+              <div class="transaction-list"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-title-row">
+                <h4>Dashboard Insights</h4>
+              </div>
+              <div class="insight-list"></div>
+            </article>
+          </section>
+
+          <!-- Quick Actions -->
+          <section class="quick-actions-row">
+            <h4>Quick Actions</h4>
+            <div class="quick-actions-grid">
+              <!-- Quick Action 1: Add Expense → /add-expense (Deepika module) -->
+              <a class="quick-action-card blue" href="{{ url_for('add_expense') }}">
+                <div class="quick-action-left">
+                  <div class="quick-action-icon"><i class="bi bi-plus-circle"></i></div>
+                  <div>
+                    <div class="quick-action-title">Add Expense</div>
+                    <div class="quick-action-subtitle">Track your spending</div>
+                  </div>
+                </div>
+                <div class="quick-action-arrow"><i class="bi bi-arrow-right"></i></div>
+              </a>
+              <!-- Quick Action 2: Create Budget → /add-budget (Deepika module) -->
+              <a class="quick-action-card orange" href="{{ url_for('add_budget') }}">
+                <div class="quick-action-left">
+                  <div class="quick-action-icon"><i class="bi bi-pie-chart"></i></div>
+                  <div>
+                    <div class="quick-action-title">Create Budget</div>
+                    <div class="quick-action-subtitle">Plan your budget</div>
+                  </div>
+                </div>
+                <div class="quick-action-arrow"><i class="bi bi-arrow-right"></i></div>
+              </a>
+              <!-- Quick Action 3: Add Income → /add-income (Navaneeth + Deepika module) -->
+              <a class="quick-action-card green" href="{{ url_for('add_income') }}">
+                <div class="quick-action-left">
+                  <div class="quick-action-icon"><i class="bi bi-graph-up"></i></div>
+                  <div>
+                    <div class="quick-action-title">Add Income</div>
+                    <div class="quick-action-subtitle">Record your earnings</div>
+                  </div>
+                </div>
+                <div class="quick-action-arrow"><i class="bi bi-arrow-right"></i></div>
+              </a>
+              <!-- Quick Action 4: Generate Report → back to dashboard (placeholder) -->
+              <a class="quick-action-card purple" href="{{ url_for('dashboard') }}">
+                <div class="quick-action-left">
+                  <div class="quick-action-icon"><i class="bi bi-file-earmark-text"></i></div>
+                  <div>
+                    <div class="quick-action-title">Generate Report</div>
+                    <div class="quick-action-subtitle">View detailed reports</div>
+                  </div>
+                </div>
+                <div class="quick-action-arrow"><i class="bi bi-arrow-right"></i></div>
+              </a>
             </div>
-          </div>
+          </section>
 
-          <!-- Net Worth Snapshot -->
-          <div class="mt-4 pt-3" style="border-top:1px solid var(--border-glass);">
-            <div style="font-family:var(--font-body);font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:0.5rem;">
-              Net Worth Snapshot
-            </div>
-            <div style="font-size:2rem;font-weight:800;color:var(--text-primary);">
-              ₹<span class="prv" data-count="6.05" data-suffix="L" data-decimals="2">0</span>
-            </div>
-            <div style="font-family:var(--font-body);font-size:0.8rem;color:var(--success);display:flex;align-items:center;gap:0.3rem;">
-              <i class="bi bi-arrow-up-right"></i>
-              <span class="prv">+₹32,400 this month (12.4% growth)</span>
-            </div>
-          </div>
-          </div><!-- /section-content trend -->
-        </div>
-      </div>
+        </div><!-- /content-stack -->
+      </main>
+    </div>
 
-    </div><!-- /bottom row -->
-
-    <!-- ── Footer ─────────────────────────────────────────── -->
-    <footer class="text-center pb-4" style="font-family:var(--font-body);font-size:0.8rem;color:var(--text-muted);">
-      <div class="auth-divider mb-3"></div>
-      &copy; 2024 FinSight — Personal Finance &amp; Investment Intelligence Platform.
-      Built with ❤️ as a B.Tech Major Project.
-    </footer>
-
-  </div><!-- /container -->
-</main>
-
-{% endblock %}
-
-{% block extra_js %}
-<script>
-/* ── Section Collapse ───────────────────────────────────────── */
-function collapseSection(contentId, btn) {
-  const content = document.getElementById(contentId);
-  if (!content) return;
-  const collapsed = content.classList.toggle('is-collapsed');
-  btn.classList.toggle('is-collapsed', collapsed);
-  btn.setAttribute('aria-expanded', !collapsed);
-  btn.title = collapsed ? 'Expand section' : 'Collapse section';
-}
-
-/* ── Privacy Mode Toggle ────────────────────────────────────── */
-function togglePrivacy(checkbox) {
-  document.body.classList.toggle('privacy-mode', checkbox.checked);
-  const label = checkbox.checked ? '🔒 Privacy ON' : '🔓 Privacy OFF';
-  showToast(label, checkbox.checked ? 'warning' : 'info');
-  localStorage.setItem('finsight_privacy', checkbox.checked ? '1' : '0');
-}
-
-/* ── Generic Setting Toggle ─────────────────────────────────── */
-function toggleSetting(checkbox, name) {
-  const state = checkbox.checked ? 'enabled' : 'disabled';
-  const emoji = checkbox.checked ? '✅' : '🔕';
-  showToast(`${emoji} ${name} ${state}`, checkbox.checked ? 'success' : 'muted');
-  localStorage.setItem('finsight_' + name.replace(/\s/g,'_').toLowerCase(), checkbox.checked ? '1' : '0');
-}
-
-/* ── Coming Soon Button Feedback ────────────────────────────── */
-function showComingSoon(btn) {
-  const orig = btn.innerHTML;
-  btn.innerHTML = '<div class="quick-action-icon" style="background:rgba(0,212,170,0.15);">🚀</div> Coming Soon!';
-  btn.style.borderColor = 'rgba(0,212,170,0.5)';
-  btn.style.color = 'var(--accent)';
-  setTimeout(() => {
-    btn.innerHTML = orig;
-    btn.style.borderColor = '';
-    btn.style.color = '';
-  }, 2000);
-}
-
-/* ── Toast Notification ─────────────────────────────────────── */
-function showToast(message, type = 'info') {
-  const colors = {
-    success: ['rgba(0,212,170,0.15)', 'rgba(0,212,170,0.4)', '#00e8bb'],
-    warning: ['rgba(255,193,7,0.15)',  'rgba(255,193,7,0.4)',  '#ffd347'],
-    info:    ['rgba(108,99,255,0.15)', 'rgba(108,99,255,0.4)', '#9b94ff'],
-    muted:   ['rgba(255,255,255,0.06)','rgba(255,255,255,0.2)','var(--text-muted)'],
-  };
-  const [bg, border, color] = colors[type] || colors.info;
-
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(20px);
-    background:${bg}; border:1px solid ${border}; color:${color};
-    padding:0.65rem 1.35rem; border-radius:99px;
-    font-family:var(--font-body); font-size:0.84rem; font-weight:600;
-    z-index:99995; backdrop-filter:blur(16px);
-    box-shadow:0 8px 32px rgba(0,0,0,0.25);
-    opacity:0; transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    white-space:nowrap;
-  `;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  requestAnimationFrame(() => {
-    toast.style.opacity = '1';
-    toast.style.transform = 'translateX(-50%) translateY(0)';
-  });
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(-50%) translateY(12px)';
-    setTimeout(() => toast.remove(), 400);
-  }, 2500);
-}
-
-/* ── Restore Saved Toggle States ────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  // Privacy
-  const privacySaved = localStorage.getItem('finsight_privacy') === '1';
-  if (privacySaved) {
-    document.getElementById('toggle-privacy').checked = true;
-    document.body.classList.add('privacy-mode');
-  }
-  // Notifications
-  const notifSaved = localStorage.getItem('finsight_notifications');
-  if (notifSaved === '0') document.getElementById('toggle-notif').checked = false;
-  // Budget
-  const budgetSaved = localStorage.getItem('finsight_budget_alerts');
-  if (budgetSaved === '0') document.getElementById('toggle-budget').checked = false;
-  // Live
-  const liveSaved = localStorage.getItem('finsight_live_prices') === '1';
-  if (liveSaved) document.getElementById('toggle-live').checked = true;
-
-  // Animate progress bars
-  setTimeout(() => {
-    document.querySelectorAll('.progress-fill').forEach(el => {
-      const w = el.style.width;
-      el.style.width = '0';
-      requestAnimationFrame(() => { setTimeout(() => { el.style.width = w; }, 50); });
-    });
-  }, 300);
-});
-</script>
-{% endblock %}
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script>
+      // Set live date in topbar
+      (function() {
+        const now = new Date();
+        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        document.getElementById('topbar-date').textContent =
+          now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+        document.getElementById('topbar-day').textContent = days[now.getDay()];
+      })();
+    </script>
+  </body>
+</html>

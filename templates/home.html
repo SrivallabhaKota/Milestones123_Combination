@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+{# FinSight – home.html | Landing Page | Module Lead: Meghna #}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<!-- Navbar -->
+<nav class="home-navbar" role="navigation" aria-label="Main navigation">
+  <div class="home-nav-inner">
+    <a href="{{ url_for('home') }}" class="home-nav-brand" aria-label="FinSight Home">
+      <img src="{{ url_for('static', filename='images/logo.jpeg') }}"
+           alt="FinSight Logo"
+           class="home-nav-logo-img">
+      <span class="home-nav-name">Finsight</span>
+    </a>
+
+    <ul class="home-nav-links" role="list">
+      <li><a href="{{ url_for('login_page') }}" class="home-nav-link" id="nav-login-link">Login</a></li>
+    </ul>
+
+    <button class="home-nav-toggler" id="home-nav-toggler"
+            aria-label="Toggle navigation"
+            aria-expanded="false"
+            aria-controls="home-nav-mobile">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="home-nav-mobile" id="home-nav-mobile" aria-hidden="true">
+    <a href="{{ url_for('login_page') }}" class="home-nav-mobile-link">Login</a>
+    <a href="{{ url_for('register') }}"  class="home-nav-mobile-link cta">Get Started</a>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="home-hero" aria-labelledby="hero-heading">
+  <div class="home-container">
+    <h1 class="hero-title" id="hero-heading">
+      Manage Your Money Smarter
+    </h1>
+    <p class="hero-subtitle">
+      Track income, control expenses, create budgets,<br>
+      and gain insights into your financial habits.
+    </p>
+    <div class="hero-actions" role="group" aria-label="Call to action">
+      <a href="{{ url_for('register') }}"
+         id="hero-get-started-btn"
+         class="hero-btn-primary"
+         aria-label="Get started with FinSight">
+        Get Started
+      </a>
+      <a href="{{ url_for('login_page') }}"
+         id="hero-login-btn"
+         class="hero-btn-outline"
+         aria-label="Login to FinSight">
+        Login
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section class="home-features" aria-labelledby="features-heading">
+  <div class="home-container">
+    <h2 class="home-section-title" id="features-heading">Why Choose Us?</h2>
+    <div class="home-features-grid" role="list">
+
+      <article class="home-feature-card" role="listitem" id="feature-income">
+        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-wallet2"></i></span>
+        <h3 class="home-feature-title">Track Income &amp; Expenses</h3>
+        <p class="home-feature-desc">
+          Keep track of your income and expenses in one place.
+        </p>
+      </article>
+
+      <article class="home-feature-card" role="listitem" id="feature-expenses">
+        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-graph-up"></i></span>
+        <h3 class="home-feature-title">Manage Expenses</h3>
+        <p class="home-feature-desc">
+          Monitor your spending and stay within your monthly budget.
+        </p>
+      </article>
+
+      <article class="home-feature-card" role="listitem" id="feature-budgets">
+        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-bullseye"></i></span>
+        <h3 class="home-feature-title">Create Budgets</h3>
+        <p class="home-feature-desc">
+          Set monthly budgets and manage your finances effectively.
+        </p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="home-footer" role="contentinfo">
+  <div class="home-container">
+    <p class="home-footer-text">
+      &copy; 2024 FinSight. Made with <i class="bi bi-heart-fill text-danger"></i> for your financial future.
+      &nbsp;|&nbsp;
+      <a href="{{ url_for('login_page') }}" class="home-footer-link">Login</a>
+      &nbsp;|&nbsp;
+      <a href="{{ url_for('register') }}"   class="home-footer-link">Register</a>
+    </p>
+  </div>
+</footer>
+
+{% endblock %}

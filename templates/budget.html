@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+{# FinSight – budget.html | Create Budget Form Page | Module Lead: Deepika #}
+{# This form lets a logged-in user define a monthly spending limit for a   #}
+{# specific category. On submission, the data is sent via POST to the      #}
+{# /add-budget route in app.py which validates and saves it to the MySQL   #}
+{# budget table. A UNIQUE KEY prevents duplicate budgets per category/month. #}
+
+{% block title %}Create Budget – FinSight{% endblock %}
+
+{% block content %}
+<!-- ══ Create Budget Form Page (Deepika) ════════════════════════════════ -->
+<div class="page-wrapper" style="padding: 2rem 1rem;">
+  <div class="auth-container">
+
+    <!-- Flash Messages (server-side feedback from app.py) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-3" role="alert" aria-live="polite">
+          {% for category, message in messages %}
+            <div class="alert-custom alert-{{ category }}" id="flash-budget-{{ loop.index }}">
+              <i class="bi
+                {% if category == 'success' %}bi-check-circle-fill
+                {% elif category == 'danger'  %}bi-exclamation-circle-fill
+                {% else %}bi-info-circle-fill{% endif %}">
+              </i>
+              <span>{{ message }}</span>
+              <button type="button" class="alert-close ms-auto"
+                      style="background:none;border:none;color:inherit;cursor:pointer;font-size:1rem;"
+                      aria-label="Close alert">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Budget Form Card -->
+    <div class="glass-card">
+
+      <!-- Card Header: Brand + Title -->
+      <div class="brand-logo">
+        <img src="{{ url_for('static', filename='images/logo.jpeg') }}"
+             alt="FinSight Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <span class="brand-name">FinSight</span>
+          <span class="brand-tagline">Budget Planner</span>
+        </div>
+      </div>
+
+      <h1 class="auth-title">Create Budget</h1>
+      <p class="auth-subtitle">Set a monthly spending limit for a category</p>
+      <div class="auth-divider"></div>
+
+      <!-- Show validation error if any (passed from app.py Deepika route) -->
+      {% if error %}
+        <div class="alert-custom alert-danger" role="alert" id="budget-error-msg">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ error }}</span>
+        </div>
+      {% endif %}
+
+      <!-- Budget Form: submits POST to /add-budget (Deepika route in app.py) -->
+      <form id="budget-form"
+            action="{{ url_for('add_budget') }}"
+            method="POST"
+            novalidate>
+
+        <!-- Field 1: Budget Category -->
+        <!-- category = the type of spending this budget applies to -->
+        <!-- e.g. Food, Housing, Transport, Entertainment, Healthcare -->
+        <div class="form-group">
+          <label for="budget-category" class="form-label">Budget Category</label>
+          <div class="input-wrapper">
+            <i class="bi bi-pie-chart-fill input-icon"></i>
+            <input type="text"
+                   id="budget-category"
+                   name="category"
+                   class="form-control-custom"
+                   placeholder="e.g. Food, Housing, Transport"
+                   required
+                   aria-label="Budget category"
+                   aria-required="true" />
+          </div>
+        </div>
+
+        <!-- Field 2: Limit Amount -->
+        <!-- limit_amount = maximum money user plans to spend in this category -->
+        <div class="form-group">
+          <label for="budget-limit" class="form-label">Spending Limit (₹)</label>
+          <div class="input-wrapper">
+            <i class="bi bi-currency-rupee input-icon"></i>
+            <input type="number"
+                   id="budget-limit"
+                   name="limit_amount"
+                   class="form-control-custom"
+                   placeholder="e.g. 5000"
+                   step="0.01"
+                   min="0.01"
+                   required
+                   aria-label="Budget spending limit"
+                   aria-required="true" />
+          </div>
+        </div>
+
+        <!-- Fields 3 & 4: Month and Year (side by side) -->
+        <!-- month = which month this budget applies to (1-12) -->
+        <!-- year  = which year this budget applies to (e.g. 2026) -->
+        <div class="reg-form-row">
+
+          <!-- Month Field -->
+          <div class="form-group">
+            <label for="budget-month" class="form-label">Month</label>
+            <div class="input-wrapper">
+              <i class="bi bi-calendar-month input-icon"></i>
+              <select id="budget-month"
+                      name="month"
+                      class="form-control-custom"
+                      required
+                      aria-label="Budget month"
+                      aria-required="true"
+                      style="cursor:pointer;">
+                <!-- Each option maps to a month number (1-12) -->
+                <option value="" disabled selected>Select Month</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Year Field -->
+          <div class="form-group">
+            <label for="budget-year" class="form-label">Year</label>
+            <div class="input-wrapper">
+              <i class="bi bi-calendar-fill input-icon"></i>
+              <input type="number"
+                     id="budget-year"
+                     name="year"
+                     class="form-control-custom"
+                     placeholder="e.g. 2026"
+                     min="2020"
+                     max="2099"
+                     required
+                     aria-label="Budget year"
+                     aria-required="true" />
+            </div>
+          </div>
+
+        </div><!-- /reg-form-row -->
+
+        <!-- Submit Button: triggers POST to /add-budget (Deepika route) -->
+        <button type="submit"
+                id="save-budget-btn"
+                class="btn-primary-custom"
+                aria-label="Create budget">
+          <i class="bi bi-plus-circle-fill me-2"></i>Create Budget
+        </button>
+
+      </form>
+
+      <div class="auth-divider my-4"></div>
+
+      <!-- Back to Dashboard link -->
+      <a href="{{ url_for('dashboard') }}"
+         id="back-to-dashboard-budget"
+         class="btn-outline-custom"
+         aria-label="Return to Dashboard">
+        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+      </a>
+
+    </div><!-- /glass-card -->
+
+    <p class="auth-footer mt-3">
+      &copy; 2024 FinSight. Budget Module developed by Deepika.
+    </p>
+
+  </div><!-- /auth-container -->
+</div><!-- /page-wrapper -->
+{% endblock %}

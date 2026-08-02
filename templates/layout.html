@@ -7,14 +7,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="FinSight – Personal Finance & Investment Intelligence Platform. Track expenses, monitor investments, and achieve your financial goals." />
-  <meta name="keywords"    content="finance, investment, expense tracker, savings, FinSight" />
+  <meta name="description" content="FinSight – Personal Finance Platform. Track expenses, manage budgets, and achieve your financial goals." />
+  <meta name="keywords"    content="finance, budget, expense tracker, savings, FinSight" />
   <meta name="author"      content="FinSight" />
-  <meta property="og:title"       content="FinSight – Finance Intelligence" />
-  <meta property="og:description" content="Your personal finance & investment intelligence platform." />
-  <meta property="og:type"        content="website" />
 
-  <title>{% block title %}FinSight{% endblock %} | Personal Finance Intelligence</title>
+  <title>{% block title %}FinSight{% endblock %} | Personal Finance</title>
 
   <!-- Bootstrap 5 CSS -->
   <link rel="stylesheet"
@@ -35,43 +32,17 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
-  <!-- Favicon (emoji fallback) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='images/logo.jpeg') }}" />
 
   {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-  <!-- ── Custom Cursor ─────────────────────────────────────── -->
-  <div id="cursor"      aria-hidden="true"></div>
+  <!-- Custom Cursor Ring (circle only, no dot) -->
   <div id="cursor-ring" aria-hidden="true"></div>
 
-  <!-- ── Particle Canvas ───────────────────────────────────── -->
-  <canvas id="bg-canvas" aria-hidden="true"></canvas>
-
-  <!-- ── Background Orbs ───────────────────────────────────── -->
-  <div class="bg-orb bg-orb-1" aria-hidden="true"></div>
-  <div class="bg-orb bg-orb-2" aria-hidden="true"></div>
-  <div class="bg-orb bg-orb-3" aria-hidden="true"></div>
-
-  <!-- ── Floating Finance Icons ────────────────────────────── -->
-  <div class="floating-icons" id="floating-icons" aria-hidden="true"></div>
-
-  <!-- ── Page Transition Overlay ───────────────────────────── -->
-  <div id="page-transition" class="page-transition-overlay" aria-hidden="true"></div>
-
-  <!-- ── Floating Theme Toggle Pill ───────────────────────── -->
-  <button id="theme-pill"
-          class="theme-pill"
-          aria-label="Toggle light/dark theme"
-          title="Switch theme">
-    <div class="theme-pill-track">
-      <div class="theme-pill-thumb" id="theme-pill-thumb">🌙</div>
-    </div>
-    <span class="theme-pill-label" id="theme-pill-label">Dark</span>
-  </button>
-
-  <!-- ── Main Content ──────────────────────────────────────── -->
+  <!-- Main Content -->
   {% block content %}{% endblock %}
 
   <!-- Bootstrap 5 JS Bundle -->

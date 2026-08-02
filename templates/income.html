@@ -1,0 +1,163 @@
+{% extends "layout.html" %}
+{# FinSight – income.html | Add Income Form Page | Module Lead: Deepika #}
+{# This form allows a logged-in user to enter their income details.     #}
+{# On submission, the data is sent via POST to the /add-income route     #}
+{# in app.py which validates and saves it to the MySQL income table.     #}
+
+{% block title %}Add Income – FinSight{% endblock %}
+
+{% block content %}
+<!-- ══ Add Income Form Page (Deepika) ════════════════════════════════════ -->
+<div class="page-wrapper" style="padding: 2rem 1rem;">
+  <div class="auth-container">
+
+    <!-- Flash Messages (server-side feedback from app.py) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-3" role="alert" aria-live="polite">
+          {% for category, message in messages %}
+            <div class="alert-custom alert-{{ category }}" id="flash-income-{{ loop.index }}">
+              <i class="bi
+                {% if category == 'success' %}bi-check-circle-fill
+                {% elif category == 'danger'  %}bi-exclamation-circle-fill
+                {% else %}bi-info-circle-fill{% endif %}">
+              </i>
+              <span>{{ message }}</span>
+              <button type="button" class="alert-close ms-auto"
+                      style="background:none;border:none;color:inherit;cursor:pointer;font-size:1rem;"
+                      aria-label="Close alert">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Income Form Card -->
+    <div class="glass-card">
+
+      <!-- Card Header: Brand + Title -->
+      <div class="brand-logo">
+        <img src="{{ url_for('static', filename='images/logo.jpeg') }}"
+             alt="FinSight Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <span class="brand-name">FinSight</span>
+          <span class="brand-tagline">Income Tracker</span>
+        </div>
+      </div>
+
+      <h1 class="auth-title">Add Income</h1>
+      <p class="auth-subtitle">Record a new income entry to track your earnings</p>
+      <div class="auth-divider"></div>
+
+      <!-- Show validation error if any (passed from app.py Deepika route) -->
+      {% if error %}
+        <div class="alert-custom alert-danger" role="alert" id="income-error-msg">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ error }}</span>
+        </div>
+      {% endif %}
+
+      <!-- Income Form: submits POST to /add-income (Deepika route in app.py) -->
+      <form id="income-form"
+            action="{{ url_for('add_income') }}"
+            method="POST"
+            novalidate>
+
+        <!-- Field 1: Income Source -->
+        <!-- Source = where the money came from (e.g. Salary, Freelance, Bonus) -->
+        <div class="form-group">
+          <label for="income-source" class="form-label">Income Source</label>
+          <div class="input-wrapper">
+            <i class="bi bi-briefcase-fill input-icon"></i>
+            <input type="text"
+                   id="income-source"
+                   name="source"
+                   class="form-control-custom"
+                   placeholder="e.g. Salary, Freelance, Bonus"
+                   required
+                   aria-label="Income source"
+                   aria-required="true" />
+          </div>
+        </div>
+
+        <!-- Field 2: Amount -->
+        <!-- Amount = the monetary value of the income in rupees -->
+        <div class="form-group">
+          <label for="income-amount" class="form-label">Amount (₹)</label>
+          <div class="input-wrapper">
+            <i class="bi bi-currency-rupee input-icon"></i>
+            <input type="number"
+                   id="income-amount"
+                   name="amount"
+                   class="form-control-custom"
+                   placeholder="e.g. 50000"
+                   step="0.01"
+                   min="0.01"
+                   required
+                   aria-label="Income amount"
+                   aria-required="true" />
+          </div>
+        </div>
+
+        <!-- Field 3: Income Date -->
+        <!-- income_date = the calendar date on which the income was received -->
+        <div class="form-group">
+          <label for="income-date" class="form-label">Date Received</label>
+          <div class="input-wrapper">
+            <i class="bi bi-calendar3 input-icon"></i>
+            <input type="date"
+                   id="income-date"
+                   name="income_date"
+                   class="form-control-custom"
+                   required
+                   aria-label="Income date"
+                   aria-required="true" />
+          </div>
+        </div>
+
+        <!-- Field 4: Notes (optional) -->
+        <!-- notes = any extra description the user wants to add -->
+        <div class="form-group">
+          <label for="income-notes" class="form-label">Notes <span style="color:var(--text-muted);font-size:0.8rem;">(optional)</span></label>
+          <div class="input-wrapper">
+            <i class="bi bi-sticky-fill input-icon"></i>
+            <input type="text"
+                   id="income-notes"
+                   name="notes"
+                   class="form-control-custom"
+                   placeholder="Any additional details..."
+                   aria-label="Income notes" />
+          </div>
+        </div>
+
+        <!-- Submit Button: triggers POST to /add-income (Deepika route) -->
+        <button type="submit"
+                id="save-income-btn"
+                class="btn-primary-custom"
+                aria-label="Save income record">
+          <i class="bi bi-plus-circle-fill me-2"></i>Save Income
+        </button>
+
+      </form>
+
+      <div class="auth-divider my-4"></div>
+
+      <!-- Back to Dashboard link -->
+      <a href="{{ url_for('dashboard') }}"
+         id="back-to-dashboard-income"
+         class="btn-outline-custom"
+         aria-label="Return to Dashboard">
+        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+      </a>
+
+    </div><!-- /glass-card -->
+
+    <p class="auth-footer mt-3">
+      &copy; 2024 FinSight. Income Module developed by Deepika.
+    </p>
+
+  </div><!-- /auth-container -->
+</div><!-- /page-wrapper -->
+{% endblock %}
