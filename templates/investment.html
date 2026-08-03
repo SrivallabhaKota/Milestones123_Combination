@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="FinSight – Create Budget. Plan and manage your monthly spending limits.">
-  <title>Create Budget – FinSight</title>
+  <meta name="description" content="FinSight – Investment Tracking. Monitor your portfolio and financial growth.">
+  <title>Investment Tracking – FinSight</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,11 +14,11 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cursor.css') }}">
 </head>
-<body class="theme-budget">
+<body class="theme-invest">
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
-<div class="d-flex">
 
+<div class="d-flex">
   <aside class="sidebar" id="sidebar">
     <div class="logo-row">
       <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="FinSight Logo" class="dash-nav-logo-img" style="width:42px;height:42px;">
@@ -31,12 +31,14 @@
           <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="bi bi-grid"></i><span>Dashboard</span></a>
           <a href="{{ url_for('add_income') }}" class="nav-item"><i class="bi bi-cash-coin"></i><span>Income Management</span></a>
           <a href="{{ url_for('add_expense') }}" class="nav-item"><i class="bi bi-wallet2"></i><span>Expense Management</span></a>
-          <a href="{{ url_for('add_budget') }}" class="nav-item active"><i class="bi bi-pie-chart"></i><span>Budget Management</span></a>
-          <a href="{{ url_for('add_investment') }}" class="nav-item"><i class="bi bi-graph-up-arrow"></i><span>Investment Tracking</span></a>
+          <a href="{{ url_for('add_budget') }}" class="nav-item"><i class="bi bi-pie-chart"></i><span>Budget Management</span></a>
+          <a href="{{ url_for('add_investment') }}" class="nav-item active"><i class="bi bi-graph-up-arrow"></i><span>Investment Tracking</span></a>
           <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="bi bi-bullseye"></i><span>Financial Goals</span></a>
           <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="bi bi-file-earmark-bar-graph"></i><span>Reports</span></a>
         </nav>
-    
+    <div class="sidebar-refresh-btn" id="sidebar-refresh" onclick="window.location.reload()">
+      <i class="bi bi-arrow-clockwise"></i><span>Refresh Data</span>
+    </div>
     
         <button class="sidebar-refresh-btn" id="sidebar-refresh-btn" type="button" onclick="if(typeof bootstrapDashboard === 'function'){ bootstrapDashboard(true); } else { window.location.reload(); }" title="Refresh Data">
           <i class="bi bi-arrow-clockwise"></i><span>Refresh Data</span>
@@ -53,7 +55,6 @@
   </aside>
 
   <main class="main-panel">
-
     <div class="topbar">
       <div class="topbar-left">
         <button class="hamburger" type="button" onclick="document.getElementById('sidebar').classList.toggle('open')">
@@ -88,26 +89,25 @@
     </div>
 
     <div class="content-stack">
-
-      <div class="page-hero budget-hero">
+      <div class="page-hero invest-hero">
         <div class="hero-left">
-          <div class="hero-icon-wrap budget-icon-wrap">
-            <i class="bi bi-pie-chart-fill"></i>
+          <div class="hero-icon-wrap invest-icon-wrap">
+            <i class="bi bi-graph-up-arrow"></i>
           </div>
           <div>
-            <h1 class="hero-title">Create Budget</h1>
-            <p class="hero-subtitle">Set a monthly spending limit for a category</p>
+            <h1 class="hero-title">Investment Tracking</h1>
+            <p class="hero-subtitle">Record investments and grow your financial portfolio</p>
           </div>
         </div>
         <div class="hero-stats">
-          <div class="hero-stat-pill purple"><i class="bi bi-shield-check-fill"></i> Budget Planner</div>
+          <div class="hero-stat-pill invest-pill"><i class="bi bi-bar-chart-fill"></i> Portfolio Manager</div>
         </div>
       </div>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-            <div class="page-alert alert-{{ category }}" id="flash-budget-{{ loop.index }}">
+            <div class="page-alert alert-{{ category }}" id="flash-invest-{{ loop.index }}">
               <i class="bi {% if category == 'success' %}bi-check-circle-fill{% elif category == 'danger' %}bi-exclamation-circle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
               <span>{{ message }}</span>
               <button type="button" class="alert-close-btn" onclick="this.parentElement.remove()"><i class="bi bi-x-lg"></i></button>
@@ -117,144 +117,134 @@
       {% endwith %}
 
       {% if error %}
-        <div class="page-alert alert-danger" id="budget-error-msg">
+        <div class="page-alert alert-danger">
           <i class="bi bi-exclamation-circle-fill"></i>
           <span>{{ error }}</span>
         </div>
       {% endif %}
 
       <div class="form-page-grid">
-
-        <div class="panel form-panel budget-accent">
+        <div class="panel form-panel invest-accent">
           <div class="form-panel-header">
-            <div class="form-panel-icon budget-bg"><i class="bi bi-plus-circle"></i></div>
+            <div class="form-panel-icon invest-bg"><i class="bi bi-plus-circle"></i></div>
             <div>
-              <h4 class="form-panel-title">New Budget Plan</h4>
-              <p class="form-panel-desc">Define your spending boundaries for this month</p>
+              <h4 class="form-panel-title">New Investment Entry</h4>
+              <p class="form-panel-desc">Record your investment to track portfolio growth</p>
             </div>
           </div>
 
-          <form id="budget-form" action="{{ url_for('add_budget') }}" method="POST" novalidate>
+          <form id="investment-form" action="{{ url_for('add_investment') }}" method="POST" novalidate>
             <div class="field-group">
-              <label for="budget-category" class="field-label">
-                <i class="bi bi-pie-chart-fill field-label-icon budget-text"></i> Budget Category
+              <label for="invest-source" class="field-label">
+                <i class="bi bi-building field-label-icon invest-text"></i> Investment Source
               </label>
               <div class="field-input-wrap">
-                <input type="text" id="budget-category" name="category" class="field-input"
-                       placeholder="e.g. Food, Housing, Transport"
-                       required aria-label="Budget category" aria-required="true">
+                <input type="text" id="invest-source" name="source" class="field-input"
+                       placeholder="e.g. Zerodha, Groww, HDFC MF"
+                       required aria-label="Investment source" aria-required="true">
               </div>
             </div>
 
             <div class="field-group">
-              <label for="budget-limit" class="field-label">
-                <i class="bi bi-currency-rupee field-label-icon budget-text"></i> Spending Limit (₹)
+              <label for="invest-type" class="field-label">
+                <i class="bi bi-tags-fill field-label-icon invest-text"></i> Investment Type
+              </label>
+              <div class="field-input-wrap">
+                <select id="invest-type" name="invest_type" class="field-input field-select" aria-label="Investment type">
+                  <option value="SIP">SIP (Systematic Investment Plan)</option>
+                  <option value="Stocks">Stocks / Equity</option>
+                  <option value="Mutual Fund">Mutual Fund</option>
+                  <option value="FD">Fixed Deposit (FD)</option>
+                  <option value="RD">Recurring Deposit (RD)</option>
+                  <option value="Crypto">Crypto</option>
+                  <option value="Gold">Gold / Silver</option>
+                  <option value="Real Estate">Real Estate</option>
+                  <option value="General" selected>General</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="invest-amount" class="field-label">
+                <i class="bi bi-currency-rupee field-label-icon invest-text"></i> Amount Invested (₹)
               </label>
               <div class="field-input-wrap amount-wrap">
-                <span class="amount-prefix budget-prefix">₹</span>
-                <input type="number" id="budget-limit" name="limit_amount" class="field-input amount-input"
+                <span class="amount-prefix invest-prefix">₹</span>
+                <input type="number" id="invest-amount" name="amount" class="field-input amount-input"
                        placeholder="0.00" step="0.01" min="0.01"
-                       required aria-label="Budget spending limit" aria-required="true">
+                       required aria-label="Investment amount" aria-required="true">
               </div>
             </div>
 
-            <div class="field-two-col">
-              <div class="field-group">
-                <label for="budget-month" class="field-label">
-                  <i class="bi bi-calendar-month field-label-icon budget-text"></i> Month
-                </label>
-                <div class="field-input-wrap">
-                  <select id="budget-month" name="month" class="field-input field-select"
-                          required aria-label="Budget month" aria-required="true">
-                    <option value="" disabled selected>Select Month</option>
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="field-group">
-                <label for="budget-year" class="field-label">
-                  <i class="bi bi-calendar-fill field-label-icon budget-text"></i> Year
-                </label>
-                <div class="field-input-wrap">
-                  <input type="number" id="budget-year" name="year" class="field-input"
-                         placeholder="e.g. 2026" min="2020" max="2099"
-                         required aria-label="Budget year" aria-required="true">
-                </div>
+            <div class="field-group">
+              <label for="invest-date" class="field-label">
+                <i class="bi bi-calendar3 field-label-icon invest-text"></i> Date of Investment
+              </label>
+              <div class="field-input-wrap">
+                <input type="date" id="invest-date" name="invest_date" class="field-input"
+                       required aria-label="Investment date" aria-required="true">
               </div>
             </div>
 
-            <button type="submit" id="save-budget-btn" class="page-submit-btn budget-btn" aria-label="Create budget">
-              <i class="bi bi-plus-circle-fill"></i> Create Budget
+            <div class="field-group">
+              <label for="invest-notes" class="field-label">
+                <i class="bi bi-sticky-fill field-label-icon invest-text"></i> Notes
+                <span class="optional-tag">optional</span>
+              </label>
+              <div class="field-input-wrap">
+                <textarea id="invest-notes" name="notes" class="field-input field-textarea"
+                          placeholder="e.g. Monthly SIP for NIFTY 50 index fund..."
+                          rows="3" aria-label="Investment notes"></textarea>
+              </div>
+            </div>
+
+            <button type="submit" id="save-invest-btn" class="page-submit-btn invest-btn" aria-label="Save investment">
+              <i class="bi bi-plus-circle-fill"></i> Save Investment
             </button>
           </form>
         </div>
 
         <div class="form-side-panel">
-          <div class="panel tips-card budget-tips-card">
+          <div class="panel tips-card invest-tips-card">
             <div class="tips-header">
-              <div class="tips-icon budget-bg"><i class="bi bi-lightbulb-fill"></i></div>
-              <h5>Budget Tips</h5>
+              <div class="tips-icon invest-bg"><i class="bi bi-lightbulb-fill"></i></div>
+              <h5>Investment Tips</h5>
             </div>
             <ul class="tips-list">
-              <li><i class="bi bi-check-circle-fill budget-text"></i> Use the 50/30/20 budget rule</li>
-              <li><i class="bi bi-check-circle-fill budget-text"></i> Set realistic spending limits</li>
-              <li><i class="bi bi-check-circle-fill budget-text"></i> Create budgets per category</li>
-              <li><i class="bi bi-check-circle-fill budget-text"></i> Review and adjust monthly</li>
+              <li><i class="bi bi-check-circle-fill invest-text"></i> Start SIPs early for compounding</li>
+              <li><i class="bi bi-check-circle-fill invest-text"></i> Diversify across asset classes</li>
+              <li><i class="bi bi-check-circle-fill invest-text"></i> Track every investment entry</li>
+              <li><i class="bi bi-check-circle-fill invest-text"></i> Review portfolio quarterly</li>
             </ul>
           </div>
 
-          <div class="panel budget-rule-card">
-            <h5 class="quick-nav-title">50 / 30 / 20 Rule</h5>
-            <div class="rule-items">
-              <div class="rule-item">
-                <div class="rule-bar needs-bar"></div>
-                <div class="rule-info"><strong>50%</strong><span>Needs</span></div>
-              </div>
-              <div class="rule-item">
-                <div class="rule-bar wants-bar"></div>
-                <div class="rule-info"><strong>30%</strong><span>Wants</span></div>
-              </div>
-              <div class="rule-item">
-                <div class="rule-bar savings-bar"></div>
-                <div class="rule-info"><strong>20%</strong><span>Savings</span></div>
-              </div>
+          <div class="panel invest-types-card">
+            <h5 class="quick-nav-title">Investment Types</h5>
+            <div class="invest-type-badges">
+              <span class="type-badge blue">📈 Stocks</span>
+              <span class="type-badge green">💹 SIP</span>
+              <span class="type-badge purple">🏦 FD/RD</span>
+              <span class="type-badge gold">🥇 Gold</span>
+              <span class="type-badge orange">🪙 Crypto</span>
             </div>
           </div>
 
           <div class="panel quick-nav-card">
             <h5 class="quick-nav-title">Quick Navigation</h5>
             <div class="quick-nav-list">
-              <a href="{{ url_for('dashboard') }}" class="quick-nav-item">
-                <i class="bi bi-grid"></i> Dashboard
-              </a>
-              <a href="{{ url_for('add_income') }}" class="quick-nav-item">
-                <i class="bi bi-graph-up-arrow"></i> Add Income
-              </a>
-              <a href="{{ url_for('add_expense') }}" class="quick-nav-item">
-                <i class="bi bi-wallet2"></i> Add Expense
-              </a>
+              <a href="{{ url_for('dashboard') }}" class="quick-nav-item"><i class="bi bi-grid"></i> Dashboard</a>
+              <a href="{{ url_for('add_income') }}" class="quick-nav-item"><i class="bi bi-graph-up-arrow"></i> Add Income</a>
+              <a href="{{ url_for('add_expense') }}" class="quick-nav-item"><i class="bi bi-wallet2"></i> Add Expense</a>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/cursor.js') }}"></script>
 <script>
   (function() {
     const now = new Date();
@@ -266,6 +256,5 @@
     if (dy) dy.textContent = days[now.getDay()];
   })();
 </script>
-    <script src="{{ url_for('static', filename='js/cursor.js') }}"></script>
-  </body>
+</body>
 </html>

@@ -7,62 +7,83 @@ document.addEventListener('DOMContentLoaded', () => {
     insights: []
   };
 
+  let analyticsChartInstance = null;
+  let spendingChartInstance = null;
+  let isRefreshing = false;
+
+  const safeSetText = (selector, text) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = text;
+  };
+
+  const safeSetHtml = (selector, html) => {
+    const el = document.querySelector(selector);
+    if (el) el.innerHTML = html;
+  };
+
   const renderSummaryCards = () => {
     if (!state.summary) return;
     const summary = state.summary;
-    document.querySelector('[data-card="income"] .amount').textContent = `₹${summary.income.total.toLocaleString()}`;
-    document.querySelector('[data-card="income"] .change').innerHTML = `${summary.income.change >= 0 ? '↑' : '↓'} ${Math.abs(summary.income.change)}% vs last month`;
 
-    document.querySelector('[data-card="expenses"] .amount').textContent = `₹${summary.expenses.total.toLocaleString()}`;
-    document.querySelector('[data-card="expenses"] .change').innerHTML = `${summary.expenses.change >= 0 ? '↑' : '↓'} ${Math.abs(summary.expenses.change)}% vs last month`;
+    safeSetText('[data-card="income"] .amount', `₹${summary.income.total.toLocaleString()}`);
+    safeSetHtml('[data-card="income"] .change', `${summary.income.change >= 0 ? '↑' : '↓'} ${Math.abs(summary.income.change)}% vs last month`);
 
-    document.querySelector('[data-card="savings"] .amount').textContent = `₹${summary.savings.total.toLocaleString()}`;
-    document.querySelector('[data-card="savings"] .change').innerHTML = `${summary.savings.change >= 0 ? '↑' : '↓'} ${Math.abs(summary.savings.change)}% vs last month`;
+    safeSetText('[data-card="expenses"] .amount', `₹${summary.expenses.total.toLocaleString()}`);
+    safeSetHtml('[data-card="expenses"] .change', `${summary.expenses.change >= 0 ? '↑' : '↓'} ${Math.abs(summary.expenses.change)}% vs last month`);
 
-    document.querySelector('[data-card="investments"] .amount').textContent = `₹${summary.investments.total.toLocaleString()}`;
-    document.querySelector('[data-card="investments"] .change').innerHTML = `${summary.investments.change >= 0 ? '↑' : '↓'} ${Math.abs(summary.investments.change)}% vs last month`;
+    safeSetText('[data-card="savings"] .amount', `₹${summary.savings.total.toLocaleString()}`);
+    safeSetHtml('[data-card="savings"] .change', `${summary.savings.change >= 0 ? '↑' : '↓'} ${Math.abs(summary.savings.change)}% vs last month`);
 
-    const totalValue = summary.income.total + summary.expenses.total + summary.savings.total + summary.investments.total;
-    const totalValueNode = document.querySelector('[data-total-value]');
-    if (totalValueNode) {
-      totalValueNode.textContent = `₹${totalValue.toLocaleString()}`;
-    }
+    safeSetText('[data-card="investments"] .amount', `₹${summary.investments.total.toLocaleString()}`);
+    safeSetHtml('[data-card="investments"] .change', `${summary.investments.change >= 0 ? '↑' : '↓'} ${Math.abs(summary.investments.change)}% vs last month`);
 
     const legend = document.querySelector('.legend-list');
-    if (!legend) return;
-    legend.innerHTML = '';
-    const segments = [
-      { label: 'Income', amount: summary.income.total, percent: summary.chart_segments.income, color: '#2563EB' },
-      { label: 'Expenses', amount: summary.expenses.total, percent: summary.chart_segments.expenses, color: '#F97316' },
-      { label: 'Savings', amount: summary.savings.total, percent: summary.chart_segments.savings, color: '#10B981' },
-      { label: 'Investments', amount: summary.investments.total, percent: summary.chart_segments.investments, color: '#8B5CF6' }
-    ];
+    if (legend) {
+      legend.innerHTML = '';
+      const segments = [
+        { label: 'Income', amount: summary.income.total, percent: summary.chart_segments.income, color: '#2563EB' },
+        { label: 'Expenses', amount: summary.expenses.total, percent: summary.chart_segments.expenses, color: '#F97316' },
+        { label: 'Savings', amount: summary.savings.total, percent: summary.chart_segments.savings, color: '#10B981' },
+        { label: 'Investments', amount: summary.investments.total, percent: summary.chart_segments.investments, color: '#8B5CF6' }
+      ];
 
-    segments.forEach((item) => {
-      const row = document.createElement('div');
-      row.className = 'legend-row';
-      row.innerHTML = `
-        <div class="legend-label"><span class="legend-dot" style="background:${item.color}"></span>${item.label}</div>
-        <div class="legend-meta"><strong>₹${item.amount.toLocaleString()}</strong><span>${item.percent}%</span></div>
-      `;
-      legend.appendChild(row);
-    });
+      segments.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'legend-row';
+        row.innerHTML = `
+          <div class="legend-label"><span class="legend-dot" style="background:${item.color}"></span>${item.label}</div>
+          <div class="legend-meta"><strong>₹${item.amount.toLocaleString()}</strong><span>${item.percent}%</span></div>
+        `;
+        legend.appendChild(row);
+      });
+    }
+
+    if (summary.savings.total > 0) {
+      safeSetText('#savings-diff-text', `You saved ₹${summary.savings.total.toLocaleString()} this month`);
+    } else {
+      safeSetText('#savings-diff-text', `Live financial breakdown from your transactions`);
+    }
   };
 
   const renderProfile = () => {
     if (!state.profile) return;
-    document.querySelector('[data-profile-name]').textContent = state.profile.name;
-    document.querySelector('[data-profile-role]').textContent = state.profile.role;
-    document.querySelector('[data-profile-email]').textContent = state.profile.email;
-    document.querySelector('[data-profile-member]').textContent = state.profile.member_since;
-    document.querySelector('[data-profile-status]').textContent = state.profile.account_status;
-    document.querySelector('[data-health-score]').textContent = `${state.profile.financial_health_score}/100`;
+    safeSetText('[data-profile-name]', state.profile.name);
+    safeSetText('[data-profile-role]', state.profile.role);
+    safeSetText('[data-profile-email]', state.profile.email);
+    safeSetText('[data-profile-member]', state.profile.member_since);
+    safeSetText('[data-profile-status]', state.profile.account_status);
+    safeSetText('[data-health-score]', `${state.profile.financial_health_score}/100`);
   };
 
   const renderTransactions = () => {
     const list = document.querySelector('.transaction-list');
     if (!list) return;
     list.innerHTML = '';
+
+    if (!state.transactions || state.transactions.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:24px 0;color:#94A3B8;font-size:0.88rem;">No recent transactions found</div>';
+      return;
+    }
 
     state.transactions.forEach((item) => {
       const row = document.createElement('div');
@@ -90,12 +111,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!state.summary) return;
     const ctx = document.getElementById('analyticsChart');
     if (!ctx) return;
-    new Chart(ctx, {
+
+    if (analyticsChartInstance) {
+      analyticsChartInstance.destroy();
+    }
+
+    analyticsChartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: ['Income', 'Expenses', 'Savings', 'Investments'],
         datasets: [{
-          data: [state.summary.chart_segments.income, state.summary.chart_segments.expenses, state.summary.chart_segments.savings, state.summary.chart_segments.investments],
+          data: [
+            state.summary.chart_segments.income || 0,
+            state.summary.chart_segments.expenses || 0,
+            state.summary.chart_segments.savings || 0,
+            state.summary.chart_segments.investments || 0
+          ],
           backgroundColor: ['#2563EB', '#F97316', '#10B981', '#8B5CF6'],
           borderWidth: 0,
           hoverOffset: 8
@@ -103,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         cutout: '68%',
         plugins: {
           legend: { display: false },
@@ -116,13 +148,13 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!chartArea) return;
           const totalValue = state.summary.income.total + state.summary.expenses.total + state.summary.savings.total + state.summary.investments.total;
           ctx.save();
-          ctx.font = '600 14px Inter';
+          ctx.font = '600 13px Inter';
           ctx.fillStyle = '#64748B';
           ctx.textAlign = 'center';
           ctx.fillText('Total', chartArea.left + (chartArea.right - chartArea.left) / 2, chartArea.top + (chartArea.bottom - chartArea.top) / 2 - 8);
-          ctx.font = '700 20px Inter';
+          ctx.font = '700 18px Inter';
           ctx.fillStyle = '#0F172A';
-          ctx.fillText(`₹${totalValue.toLocaleString()}`, chartArea.left + (chartArea.right - chartArea.left) / 2, chartArea.top + (chartArea.bottom - chartArea.top) / 2 + 18);
+          ctx.fillText(`₹${totalValue.toLocaleString()}`, chartArea.left + (chartArea.right - chartArea.left) / 2, chartArea.top + (chartArea.bottom - chartArea.top) / 2 + 16);
           ctx.restore();
         }
       }]
@@ -133,14 +165,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!state.spending) return;
     const ctx = document.getElementById('spendingChart');
     if (!ctx) return;
-    new Chart(ctx, {
+
+    if (spendingChartInstance) {
+      spendingChartInstance.destroy();
+    }
+
+    const values = state.spending.values || [0];
+    const peak = Math.max(...values, 0);
+    safeSetText('#spending-peak-tooltip', `Peak: ₹${peak.toLocaleString()}`);
+
+    spendingChartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: state.spending.labels,
+        labels: state.spending.labels || ['No Data'],
         datasets: [{
           label: 'Spending',
-          data: state.spending.values,
+          data: values,
           borderColor: '#3B82F6',
+          borderWidth: 3,
           backgroundColor: (context) => {
             const chart = context.chart;
             const {ctx, chartArea} = chart;
@@ -152,8 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           fill: true,
           tension: 0.4,
-          pointRadius: 4,
-          pointHoverRadius: 5,
+          pointRadius: 5,
+          pointHoverRadius: 7,
           pointBackgroundColor: '#2563EB'
         }]
       },
@@ -164,7 +206,12 @@ document.addEventListener('DOMContentLoaded', () => {
         scales: {
           y: {
             beginAtZero: true,
-            ticks: { callback: (value) => `₹${value / 1000}k` },
+            ticks: {
+              callback: (value) => {
+                if (value >= 1000) return `₹${Math.round(value / 1000)}k`;
+                return `₹${value}`;
+              }
+            },
             grid: { color: 'rgba(148, 163, 184, 0.16)' }
           },
           x: { grid: { display: false } }
@@ -177,6 +224,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const list = document.querySelector('.insight-list');
     if (!list) return;
     list.innerHTML = '';
+
+    if (!state.insights || state.insights.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:24px 0;color:#94A3B8;font-size:0.88rem;">No insights available</div>';
+      return;
+    }
+
     state.insights.forEach((item) => {
       const row = document.createElement('div');
       row.className = 'insight-item';
@@ -192,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="insight-badge ${item.title === 'Budget Status' || item.title === 'Savings Rate' ? 'badge-on-track' : 'badge-purple'}">${item.status}</div>
         </div>
         <div class="progress-bar">
-          <span style="background:${item.color};width:${item.percentage}%"></span>
+          <span style="background:${item.color};width:${Math.min(100, Math.max(0, item.percentage))}%"></span>
         </div>
       `;
       list.appendChild(row);
@@ -207,7 +260,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return response.json();
   };
 
-  const bootstrapDashboard = async () => {
+  const bootstrapDashboard = async (isRefresh = false) => {
+    if (isRefreshing) return;
+    isRefreshing = true;
+
+    const refreshBtn = document.getElementById('sidebar-refresh-btn');
+    if (refreshBtn && isRefresh) {
+      refreshBtn.classList.add('refreshing');
+      refreshBtn.querySelector('span').textContent = 'Refreshing...';
+    }
+
     try {
       const [summary, profile, transactions, spending, insights] = await Promise.all([
         fetchJson('/api/dashboard-summary'),
@@ -221,20 +283,40 @@ document.addEventListener('DOMContentLoaded', () => {
       state.transactions = transactions;
       state.spending = spending;
       state.insights = insights;
+
       renderSummaryCards();
       renderProfile();
       renderTransactions();
       renderAnalyticsChart();
       renderSpendingChart();
       renderInsights();
+
+      if (isRefresh) {
+        // Flash success indicator on stat cards
+        document.querySelectorAll('.stat-card').forEach(card => {
+          card.classList.add('refresh-flash');
+          setTimeout(() => card.classList.remove('refresh-flash'), 800);
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error bootstrapping dashboard:', error);
+    } finally {
+      isRefreshing = false;
+      if (refreshBtn && isRefresh) {
+        refreshBtn.classList.remove('refreshing');
+        refreshBtn.querySelector('span').textContent = 'Refresh Data';
+      }
     }
   };
 
-  bootstrapDashboard();
+  bootstrapDashboard(false);
 
-  // Highlight the active sidebar nav item when clicked
+  // Sidebar refresh button
+  const refreshBtn = document.getElementById('sidebar-refresh-btn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => bootstrapDashboard(true));
+  }
+
   document.querySelectorAll('.nav-item').forEach((item) => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach((nav) => nav.classList.remove('active'));
@@ -242,7 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // NOTE: The old data-route event.preventDefault() block has been removed.
-  // Previously it was intercepting all anchor link clicks and blocking navigation.
-  // All buttons and links now navigate directly to their href URLs as expected.
+  // Animate stat cards on load
+  document.querySelectorAll('.stat-card').forEach((card, i) => {
+    card.style.animationDelay = `${i * 80}ms`;
+    card.classList.add('card-enter');
+  });
 });

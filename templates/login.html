@@ -1,21 +1,18 @@
 {% extends "layout.html" %}
-{# FinSight – login.html | Authentication Module (Login) | Module Lead: Vallabha #}
 
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<!-- ══ Main Page Wrapper ═════════════════════════════════════ -->
+
 <div class="page-wrapper">
   <div class="auth-container">
 
-    <!-- ══ Flash Alert Messages (Server-side Feedback) ═══════ -->
-    {# Renders error/success notification banners flashed from app.py #}
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="mb-3" role="alert" aria-live="polite">
           {% for category, message in messages %}
             <div class="alert-custom alert-{{ category }}" id="flash-{{ loop.index }}">
-              <!-- Select icon based on flash message category (success/danger/warning/info) -->
+
               <i class="bi
                 {% if category == 'success' %}bi-check-circle-fill
                 {% elif category == 'danger'  %}bi-exclamation-circle-fill
@@ -23,7 +20,7 @@
                 {% else %}bi-info-circle-fill{% endif %}">
               </i>
               <span>{{ message }}</span>
-              <!-- Manual alert dismissal button -->
+
               <button type="button" class="alert-close ms-auto"
                       style="background:none;border:none;color:inherit;cursor:pointer;font-size:1rem;"
                       aria-label="Close alert">
@@ -35,10 +32,8 @@
       {% endif %}
     {% endwith %}
 
-    <!-- ══ Glassmorphism Login Card ══════════════════════════ -->
     <div class="glass-card">
 
-      <!-- Brand Logo Section -->
       <div class="brand-logo">
         <img src="{{ url_for('static', filename='images/logo.jpeg') }}"
              alt="FinSight Logo"
@@ -49,20 +44,16 @@
         </div>
       </div>
 
-      <!-- Card Title & Subtitle -->
       <h1 class="auth-title">Welcome Back</h1>
       <p class="auth-subtitle">Sign in to your FinSight account to continue</p>
 
       <div class="auth-divider"></div>
 
-      <!-- ══ Login Form ════════════════════════════════════ -->
-      <!-- Submits credentials to Flask route /login via POST request -->
       <form id="login-form"
             action="{{ url_for('login_page') }}"
             method="POST"
             novalidate>
 
-        <!-- Input Field 1: Email Address -->
         <div class="form-group">
           <label for="email" class="form-label">Email Address</label>
           <div class="input-wrapper">
@@ -79,11 +70,10 @@
               aria-required="true"
             />
           </div>
-          <!-- Live Client-side Email Validation Message Container -->
+
           <div id="email-validation-msg" class="validation-msg" aria-live="polite"></div>
         </div>
 
-        <!-- Input Field 2: Password -->
         <div class="form-group">
           <label for="password" class="form-label">Password</label>
           <div class="input-wrapper has-right-icon">
@@ -99,7 +89,7 @@
               aria-label="Password"
               aria-required="true"
             />
-            <!-- Show/Hide Password Toggle Eye Button -->
+
             <button
               type="button"
               id="toggle-password"
@@ -111,7 +101,6 @@
           </div>
         </div>
 
-        <!-- Remember Me Checkbox & Forgot Password Link -->
         <div class="d-flex align-items-center justify-content-between mb-4 mt-1">
           <label class="custom-check" for="remember">
             <input type="checkbox" id="remember" name="remember" />
@@ -124,7 +113,6 @@
           </a>
         </div>
 
-        <!-- Form Submit Button with Processing Spinner -->
         <button
           type="submit"
           id="login-btn"
@@ -135,10 +123,8 @@
 
       </form>
 
-      <!-- ── Divider ──────────────────────────────────────── -->
       <div class="auth-divider my-4"></div>
 
-      <!-- Action Button to Navigate to Registration Page -->
       <a href="{{ url_for('register') }}"
          id="create-account-btn"
          class="btn-outline-custom"
@@ -146,13 +132,12 @@
         <i class="bi bi-person-plus-fill me-2"></i>Create New Account
       </a>
 
-    </div><!-- /glass-card -->
+    </div>
 
-    <!-- Card Footer -->
     <p class="auth-footer mt-3">
       &copy; 2024 FinSight. Made with ❤️ for your financial future.
     </p>
 
-  </div><!-- /auth-container -->
-</div><!-- /page-wrapper -->
+  </div>
+</div>
 {% endblock %}

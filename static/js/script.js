@@ -5,48 +5,6 @@
 
 'use strict';
 
-// ── Custom Cursor Ring ─────────────────────────────────────
-(function initCursorRing() {
-  const ring = document.getElementById('cursor-ring');
-  if (!ring) return;
-
-  let ringX = 0, ringY = 0;
-  let mouseX = 0, mouseY = 0;
-
-  document.addEventListener('mousemove', function(e) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  // Smooth follow
-  function animate() {
-    ringX += (mouseX - ringX) * 0.15;
-    ringY += (mouseY - ringY) * 0.15;
-    ring.style.left = ringX + 'px';
-    ring.style.top  = ringY + 'px';
-    requestAnimationFrame(animate);
-  }
-  animate();
-
-  // On click – briefly expand the ring
-  document.addEventListener('mousedown', function() {
-    ring.classList.add('ring-click');
-  });
-  document.addEventListener('mouseup', function() {
-    ring.classList.remove('ring-click');
-  });
-
-  // Slightly grow ring on buttons/links hover
-  document.querySelectorAll('a, button, input, label').forEach(function(el) {
-    el.addEventListener('mouseenter', function() {
-      ring.classList.add('ring-hover');
-    });
-    el.addEventListener('mouseleave', function() {
-      ring.classList.remove('ring-hover');
-    });
-  });
-})();
-
 
 // ── Flash Alert Auto-dismiss ───────────────────────────────
 (function initAlerts() {
