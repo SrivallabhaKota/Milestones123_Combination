@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (legend) {
       legend.innerHTML = '';
       const segments = [
-        { label: 'Income', amount: summary.income.total, percent: summary.chart_segments.income, color: '#2563EB' },
         { label: 'Expenses', amount: summary.expenses.total, percent: summary.chart_segments.expenses, color: '#F97316' },
         { label: 'Savings', amount: summary.savings.total, percent: summary.chart_segments.savings, color: '#10B981' },
         { label: 'Investments', amount: summary.investments.total, percent: summary.chart_segments.investments, color: '#8B5CF6' }
@@ -119,15 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
     analyticsChartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Income', 'Expenses', 'Savings', 'Investments'],
+        labels: ['Expenses', 'Savings', 'Investments'],
         datasets: [{
           data: [
-            state.summary.chart_segments.income || 0,
             state.summary.chart_segments.expenses || 0,
             state.summary.chart_segments.savings || 0,
             state.summary.chart_segments.investments || 0
           ],
-          backgroundColor: ['#2563EB', '#F97316', '#10B981', '#8B5CF6'],
+          backgroundColor: ['#F97316', '#10B981', '#8B5CF6'],
           borderWidth: 0,
           hoverOffset: 8
         }]
@@ -146,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         beforeDraw(chart) {
           const {ctx, chartArea} = chart;
           if (!chartArea) return;
-          const totalValue = state.summary.income.total + state.summary.expenses.total + state.summary.savings.total + state.summary.investments.total;
+          const totalValue = state.summary.expenses.total + state.summary.savings.total + state.summary.investments.total;
           ctx.save();
           ctx.font = '600 13px Inter';
           ctx.fillStyle = '#64748B';
