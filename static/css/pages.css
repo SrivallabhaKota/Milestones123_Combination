@@ -143,9 +143,11 @@
 /* ── Page Layout Grid ───────────────────────────────────────── */
 .form-page-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr;
+  max-width: 800px;
+  margin: 0 auto;
   gap: 20px;
-  align-items: start;
+  width: 100%;
 }
 
 /* ── Form Panel ─────────────────────────────────────────────── */
