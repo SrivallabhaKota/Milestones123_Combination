@@ -40,9 +40,7 @@
         
 
         
-        <button class="sidebar-refresh-btn" id="sidebar-refresh-btn" type="button" onclick="if(typeof bootstrapDashboard === 'function'){ bootstrapDashboard(true); } else { window.location.reload(); }" title="Refresh Data">
-          <i class="bi bi-arrow-clockwise"></i><span>Refresh Data</span>
-        </button>
+        
         <button class="sidebar-reset-btn" id="sidebar-reset-btn" type="button" onclick="if(confirm('Are you sure you want to reset all data to 0?')) { fetch('/api/reset-data', {method: 'POST'}).then(() => { if(typeof bootstrapDashboard === 'function'){ bootstrapDashboard(false); } else { window.location.href='/dashboard'; } }); }" title="Reset all data to 0">
           <i class="bi bi-trash"></i><span>Reset Data</span>
         </button>

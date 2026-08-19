@@ -274,12 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isRefreshing) return;
     isRefreshing = true;
 
-    const refreshBtn = document.getElementById('sidebar-refresh-btn');
-    if (refreshBtn && isRefresh) {
-      refreshBtn.classList.add('refreshing');
-      refreshBtn.querySelector('span').textContent = 'Refreshing...';
-    }
-
     try {
       const [summary, profile, transactions, spending, insights] = await Promise.all([
         fetchJson('/api/dashboard-summary'),
@@ -312,20 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Error bootstrapping dashboard:', error);
     } finally {
       isRefreshing = false;
-      if (refreshBtn && isRefresh) {
-        refreshBtn.classList.remove('refreshing');
-        refreshBtn.querySelector('span').textContent = 'Refresh Data';
-      }
     }
   };
 
   bootstrapDashboard(false);
 
-  // Sidebar refresh button
-  const refreshBtn = document.getElementById('sidebar-refresh-btn');
-  if (refreshBtn) {
-    refreshBtn.addEventListener('click', () => bootstrapDashboard(true));
-  }
 
   document.querySelectorAll('.nav-item').forEach((item) => {
     item.addEventListener('click', () => {
