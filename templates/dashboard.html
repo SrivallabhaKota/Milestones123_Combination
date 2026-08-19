@@ -34,7 +34,7 @@
           <a href="{{ url_for('add_budget') }}" class="nav-item"><i class="bi bi-pie-chart"></i><span>Budget Management</span></a>
           <a href="{{ url_for('add_investment') }}" class="nav-item"><i class="bi bi-graph-up-arrow"></i><span>Investment Tracking</span></a>
           <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="bi bi-bullseye"></i><span>Financial Goals</span></a>
-          <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="bi bi-file-earmark-bar-graph"></i><span>Reports</span></a>
+          
         </nav>
 
         
@@ -47,57 +47,10 @@
           <i class="bi bi-trash"></i><span>Reset Data</span>
         </button>
     
-        <div class="sidebar-promo">
-          <h6><i class="bi bi-star-fill text-warning"></i> Upgrade to Pro</h6>
-          <p>Unlock advanced analytics, custom reports and more.</p>
-
-          <a class="btn btn-primary" href="{{ url_for('add_income') }}">Upgrade Now</a>
-        </div>
+        
       </aside>
 
       <main class="main-panel">
-
-        <div class="topbar">
-          <div class="topbar-left">
-            <button class="hamburger" type="button"
-                    onclick="document.getElementById('sidebar').classList.toggle('open')">
-              <i class="bi bi-list"></i>
-            </button>
-            <div class="search-box">
-              <i class="bi bi-search"></i>
-              <input type="text" placeholder="Search anything...">
-              <span class="shortcut">Ctrl+K</span>
-            </div>
-          </div>
-          <div class="topbar-right">
-            <div class="topbar-pill"><i class="bi bi-command"></i>Ctrl+K</div>
-            <div class="icon-badge"><i class="bi bi-bell"></i><span class="badge-dot red"></span></div>
-            <div class="icon-badge"><i class="bi bi-chat-left-text"></i><span class="badge-dot purple"></span></div>
-            <div class="calendar-badge">
-              <i class="bi bi-calendar3"></i>
-              <div class="date-block">
-                <strong id="topbar-date">–</strong>
-                <span id="topbar-day">–</span>
-              </div>
-            </div>
-            <div class="icon-badge"><i class="bi bi-gear"></i></div>
-            <div class="vr"></div>
-
-            <div class="profile-chip">
-              <div class="avatar" id="topbar-avatar">{{ user_name[0].upper() if user_name else 'U' }}</div>
-              <div class="profile-name">
-                <strong data-profile-name>{{ user_name }}</strong>
-                <span>Premium User</span>
-              </div>
-              <i class="bi bi-chevron-down"></i>
-            </div>
-
-            <a href="{{ url_for('logout') }}" class="topbar-logout" id="logout-btn"
-               aria-label="Logout from FinSight">
-              <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
-          </div>
-        </div>
 
         <div class="content-stack">
 
@@ -135,30 +88,6 @@
               <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
             </div>
           </section>
-
-          <div class="analytics-ribbon" id="analytics-ribbon">
-            <div class="ribbon-left">
-              <div class="ribbon-search-wrap">
-                <i class="bi bi-search"></i>
-                <input type="text" id="ribbon-search-input" placeholder="Search transactions, categories, reports…" autocomplete="off">
-                <span class="ribbon-shortcut">⌘K</span>
-              </div>
-            </div>
-            <div class="ribbon-right">
-              <div class="ribbon-badge"><i class="bi bi-bell"></i><span class="ribbon-dot"></span></div>
-              <div class="ribbon-divider"></div>
-              <div class="ribbon-user">
-                <div class="ribbon-avatar" id="ribbon-avatar">{{ user_name[0].upper() if user_name else 'U' }}</div>
-                <div class="ribbon-user-info">
-                  <strong id="ribbon-user-name">{{ user_name }}</strong>
-                  <span id="ribbon-user-role">Premium User</span>
-                </div>
-                <i class="bi bi-chevron-down" style="font-size:0.78rem;color:#64748B;"></i>
-              </div>
-              <div class="ribbon-status-pill"><span class="ribbon-status-dot"></span>Active</div>
-            </div>
-          </div>
-
           <section class="dashboard-grid full-analytics">
             <article class="panel analytics-panel">
               <div class="panel-title-row">
@@ -226,55 +155,7 @@
             </article>
           </section>
 
-          <section class="quick-actions-row">
-            <h4>Quick Actions</h4>
-            <div class="quick-actions-grid">
-
-              <a class="quick-action-card blue" href="{{ url_for('add_expense') }}">
-                <div class="quick-action-left">
-                  <div class="quick-action-icon"><i class="bi bi-plus-circle"></i></div>
-                  <div>
-                    <div class="quick-action-title">Add Expense</div>
-                    <div class="quick-action-subtitle">Track your spending</div>
-                  </div>
-                </div>
-                <div class="quick-action-arrow"><i class="bi bi-arrow-right"></i></div>
-              </a>
-
-              <a class="quick-action-card orange" href="{{ url_for('add_budget') }}">
-                <div class="quick-action-left">
-                  <div class="quick-action-icon"><i class="bi bi-pie-chart"></i></div>
-                  <div>
-                    <div class="quick-action-title">Create Budget</div>
-                    <div class="quick-action-subtitle">Plan your budget</div>
-                  </div>
-                </div>
-                <div class="quick-action-arrow"><i class="bi bi-arrow-right"></i></div>
-              </a>
-
-              <a class="quick-action-card green" href="{{ url_for('add_income') }}">
-                <div class="quick-action-left">
-                  <div class="quick-action-icon"><i class="bi bi-graph-up"></i></div>
-                  <div>
-                    <div class="quick-action-title">Add Income</div>
-                    <div class="quick-action-subtitle">Record your earnings</div>
-                  </div>
-                </div>
-                <div class="quick-action-arrow"><i class="bi bi-arrow-right"></i></div>
-              </a>
-
-              <a class="quick-action-card purple" href="{{ url_for('dashboard') }}">
-                <div class="quick-action-left">
-                  <div class="quick-action-icon"><i class="bi bi-file-earmark-text"></i></div>
-                  <div>
-                    <div class="quick-action-title">Generate Report</div>
-                    <div class="quick-action-subtitle">View detailed reports</div>
-                  </div>
-                </div>
-                <div class="quick-action-arrow"><i class="bi bi-arrow-right"></i></div>
-              </a>
-            </div>
-          </section>
+          
 
         </div>
       </main>

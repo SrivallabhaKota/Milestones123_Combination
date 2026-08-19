@@ -34,7 +34,7 @@
           <a href="{{ url_for('add_budget') }}" class="nav-item"><i class="bi bi-pie-chart"></i><span>Budget Management</span></a>
           <a href="{{ url_for('add_investment') }}" class="nav-item"><i class="bi bi-graph-up-arrow"></i><span>Investment Tracking</span></a>
           <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="bi bi-bullseye"></i><span>Financial Goals</span></a>
-          <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="bi bi-file-earmark-bar-graph"></i><span>Reports</span></a>
+          
         </nav>
     
     
@@ -45,47 +45,10 @@
           <i class="bi bi-trash"></i><span>Reset Data</span>
         </button>
     
-        <div class="sidebar-promo">
-      <h6><i class="bi bi-star-fill text-warning"></i> Upgrade to Pro</h6>
-      <p>Unlock advanced analytics, custom reports and more.</p>
-      <a class="btn btn-primary" href="#">Upgrade Now</a>
-    </div>
+        
   </aside>
 
   <main class="main-panel">
-
-    <div class="topbar">
-      <div class="topbar-left">
-        <button class="hamburger" type="button" onclick="document.getElementById('sidebar').classList.toggle('open')">
-          <i class="bi bi-list"></i>
-        </button>
-        <div class="search-box">
-          <i class="bi bi-search"></i>
-          <input type="text" placeholder="Search anything...">
-          <span class="shortcut">Ctrl+K</span>
-        </div>
-      </div>
-      <div class="topbar-right">
-        <div class="icon-badge"><i class="bi bi-bell"></i><span class="badge-dot red"></span></div>
-        <div class="calendar-badge">
-          <i class="bi bi-calendar3"></i>
-          <div class="date-block">
-            <strong id="topbar-date">–</strong>
-            <span id="topbar-day">–</span>
-          </div>
-        </div>
-        <div class="icon-badge"><i class="bi bi-gear"></i></div>
-        <div class="vr"></div>
-        <div class="profile-chip">
-          <div class="avatar">{{ user_name[0].upper() if user_name else 'U' }}</div>
-          <div class="profile-name">
-            <strong>{{ user_name }}</strong>
-            <span>Premium User</span>
-          </div>
-        </div>
-        <a href="{{ url_for('logout') }}" class="topbar-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
-      </div>
-    </div>
 
     <div class="content-stack">
 
