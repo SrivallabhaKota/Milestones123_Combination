@@ -55,6 +55,10 @@
 .invest-hero {
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%);
 }
+.dash-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  margin-bottom: 24px;
+}
 
 .page-hero::before {
   content: '';
@@ -94,6 +98,8 @@
 .expense-icon-wrap { background: rgba(249,115,22,0.25); color: #FDBA74; }
 .budget-icon-wrap  { background: rgba(139,92,246,0.25); color: #C4B5FD; }
 .invest-icon-wrap  { background: rgba(99,102,241,0.25); color: #A5B4FC; }
+.dash-icon-wrap    { background: rgba(255,255,255,0.15); color: #F1F5F9; }
+
 
 .hero-title {
   margin: 0;

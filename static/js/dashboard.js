@@ -319,6 +319,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Set dynamic greeting based on time of day
+  (function initDashboardGreeting() {
+    const greetingEl = document.getElementById('dashboard-greeting');
+    const iconEl = document.getElementById('dashboard-greeting-icon');
+    if (!greetingEl) return;
+
+    const username = greetingEl.getAttribute('data-username') || 'User';
+    const hour = new Date().getHours();
+    let greet = 'Hello';
+    let iconClass = 'bi-sun';
+
+    if (hour < 12) {
+      greet = 'Good morning';
+      iconClass = 'bi-sun';
+    } else if (hour < 17) {
+      greet = 'Good afternoon';
+      iconClass = 'bi-cloud-sun';
+    } else {
+      greet = 'Good evening';
+      iconClass = 'bi-moon-stars';
+    }
+
+    greetingEl.textContent = `${greet}, ${username}!`;
+    if (iconEl) {
+      iconEl.className = `bi ${iconClass}`;
+    }
+  })();
+
   // Animate stat cards on load
   document.querySelectorAll('.stat-card').forEach((card, i) => {
     card.style.animationDelay = `${i * 80}ms`;
