@@ -41,21 +41,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (legend) {
       legend.innerHTML = '';
       const segments = [
-        { label: 'Expenses', amount: summary.expenses.total, percent: summary.chart_segments.expenses, color: '#F97316' },
+        { label: 'Expenses', amount: summary.expenses.total, percent: summary.chart_segments.expenses, color: '#2563EB' },
         { label: 'Savings', amount: summary.savings.total, percent: summary.chart_segments.savings, color: '#10B981' },
-        { label: 'Investments', amount: summary.investments.total, percent: summary.chart_segments.investments, color: '#8B5CF6' }
+        { label: 'Investments', amount: summary.investments.total, percent: summary.chart_segments.investments, color: '#F97316' },
+        { label: 'Remaining', amount: summary.remaining.total, percent: summary.chart_segments.remaining, color: '#8B5CF6' }
       ];
+
+      const icons = {
+        'Expenses': '<i class="bi bi-wallet2" style="font-size:1.15rem;"></i>',
+        'Savings': '<i class="bi bi-piggy-bank" style="font-size:1.15rem;"></i>',
+        'Investments': '<i class="bi bi-graph-up-arrow" style="font-size:1.15rem;"></i>',
+        'Remaining': '<i class="bi bi-arrow-repeat" style="font-size:1.15rem;"></i>'
+      };
 
       segments.forEach((item) => {
         const row = document.createElement('div');
         row.className = 'legend-row';
+        row.style.borderTop = `3px solid ${item.color}`;
         row.innerHTML = `
-          <div class="legend-label"><span class="legend-dot" style="background:${item.color}"></span>${item.label}</div>
-          <div class="legend-meta"><strong>₹${item.amount.toLocaleString()}</strong><span>${item.percent}%</span></div>
+          <div class="legend-label" style="color:${item.color}">${icons[item.label] || ''} <span>${item.label}</span></div>
+          <div class="legend-meta"><strong>₹${item.amount.toLocaleString()}</strong> <span style="font-size:0.78rem;font-weight:600;color:#64748B;">(${item.percent}%)</span></div>
         `;
         legend.appendChild(row);
       });
     }
+
+    safeSetText('#income-allocation-subtitle', `How your ₹${summary.income.total.toLocaleString()} income is allocated`);
 
     if (summary.savings.total > 0) {
       safeSetText('#savings-diff-text', `You saved ₹${summary.savings.total.toLocaleString()} this month`);
@@ -118,14 +129,15 @@ document.addEventListener('DOMContentLoaded', () => {
     analyticsChartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Expenses', 'Savings', 'Investments'],
+        labels: ['Expenses', 'Savings', 'Investments', 'Remaining'],
         datasets: [{
           data: [
             state.summary.chart_segments.expenses || 0,
             state.summary.chart_segments.savings || 0,
-            state.summary.chart_segments.investments || 0
+            state.summary.chart_segments.investments || 0,
+            state.summary.chart_segments.remaining || 0
           ],
-          backgroundColor: ['#F97316', '#10B981', '#8B5CF6'],
+          backgroundColor: ['#2563EB', '#10B981', '#F97316', '#8B5CF6'],
           borderWidth: 0,
           hoverOffset: 8
         }]
@@ -144,13 +156,13 @@ document.addEventListener('DOMContentLoaded', () => {
         beforeDraw(chart) {
           const {ctx, chartArea} = chart;
           if (!chartArea) return;
-          const totalValue = state.summary.expenses.total + state.summary.savings.total + state.summary.investments.total;
+          const totalValue = state.summary.income.total;
           ctx.save();
           ctx.font = '600 13px Inter';
           ctx.fillStyle = '#64748B';
           ctx.textAlign = 'center';
-          ctx.fillText('Total', chartArea.left + (chartArea.right - chartArea.left) / 2, chartArea.top + (chartArea.bottom - chartArea.top) / 2 - 8);
-          ctx.font = '700 18px Inter';
+          ctx.fillText('Total Income', chartArea.left + (chartArea.right - chartArea.left) / 2, chartArea.top + (chartArea.bottom - chartArea.top) / 2 - 8);
+          ctx.font = '700 20px Inter';
           ctx.fillStyle = '#0F172A';
           ctx.fillText(`₹${totalValue.toLocaleString()}`, chartArea.left + (chartArea.right - chartArea.left) / 2, chartArea.top + (chartArea.bottom - chartArea.top) / 2 + 16);
           ctx.restore();

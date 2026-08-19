@@ -262,15 +262,17 @@ def api_dashboard_summary():
             cur.execute('SELECT COALESCE(SUM(amount), 0) AS total FROM investments WHERE user_id = %s', (user_id,))
             total_investments = float(cur.fetchone()['total'])
         conn.close()
-        total_savings = max(0, total_income - total_expenses - total_investments)
-        total_value = total_income + total_expenses + total_savings + total_investments
-        if total_value > 0:
-            income_pct = round(total_income / total_value * 100)
-            expenses_pct = round(total_expenses / total_value * 100)
-            savings_pct = round(total_savings / total_value * 100)
-            investments_pct = round(total_investments / total_value * 100)
+        total_savings = min(total_income * 0.25, max(0, total_income - total_expenses - total_investments))
+        remaining_balance = max(0, total_income - total_expenses - total_investments - total_savings)
+        
+        if total_income > 0:
+            expenses_pct = round(total_expenses / total_income * 100)
+            savings_pct = round(total_savings / total_income * 100)
+            investments_pct = round(total_investments / total_income * 100)
+            remaining_pct = max(0, 100 - expenses_pct - savings_pct - investments_pct)
         else:
-            income_pct = expenses_pct = savings_pct = investments_pct = 0
+            expenses_pct = savings_pct = investments_pct = remaining_pct = 0
+            
         prev_month = datetime.now().replace(day=1) - timedelta(days=1)
         try:
             conn2 = get_db_connection()
@@ -295,8 +297,8 @@ def api_dashboard_summary():
             income_change = pct_change(cur_income, prev_income)
             expenses_change = pct_change(cur_expenses, prev_expenses)
             invest_change = pct_change(cur_invest, prev_invest)
-            cur_savings = max(0, cur_income - cur_expenses - cur_invest)
-            prev_savings = max(0, prev_income - prev_expenses - prev_invest)
+            cur_savings = min(cur_income * 0.25, max(0, cur_income - cur_expenses - cur_invest))
+            prev_savings = min(prev_income * 0.25, max(0, prev_income - prev_expenses - prev_invest))
             savings_change = pct_change(cur_savings, prev_savings)
         except:
             income_change = expenses_change = savings_change = invest_change = 0
@@ -305,9 +307,12 @@ def api_dashboard_summary():
             'expenses':    {'total': total_expenses,    'change': expenses_change},
             'savings':     {'total': total_savings,     'change': savings_change},
             'investments': {'total': total_investments, 'change': invest_change},
+            'remaining':   {'total': remaining_balance},
             'chart_segments': {
-                'income': income_pct, 'expenses': expenses_pct,
-                'savings': savings_pct, 'investments': investments_pct
+                'expenses': expenses_pct,
+                'savings': savings_pct,
+                'investments': investments_pct,
+                'remaining': remaining_pct
             }
         })
     except Exception as e:

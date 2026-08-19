@@ -202,16 +202,17 @@ a { color: inherit; text-decoration: none; }
 .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
 .panel { background: var(--white); border-radius: var(--border-radius-card); padding: 24px; box-shadow: var(--shadow); }
 
-.analytics-body { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: center; padding: 10px 0; }
-.chart-wrapper { position: relative; display: flex; justify-content: center; align-items: center; }
-.chart-wrapper canvas { max-width: 240px; max-height: 240px; }
-.legend-list { display: flex; flex-direction: column; gap: 12px; }
-.legend-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 6px 12px; background: #F8FAFC; border-radius: 10px; }
-.legend-label { display: flex; align-items: center; gap: 8px; color: var(--text-dark); font-size: 0.92rem; font-weight: 600; }
-.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
-.legend-meta { text-align: right; }
-.legend-meta strong { display: block; font-size: 0.95rem; }
-.legend-meta span { color: var(--text-muted); font-size: 0.8rem; }
+.analytics-body { display: flex; flex-direction: column; gap: 30px; align-items: center; padding: 15px 0; }
+.chart-wrapper { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; }
+.chart-wrapper canvas { max-width: 250px !important; max-height: 250px !important; }
+.legend-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; }
+.legend-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 14px 12px; background: #F8FAFC; border-radius: 12px; border: 1.5px solid #F1F5F9; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
+.legend-row:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.legend-label { display: flex; align-items: center; gap: 7px; font-size: 0.95rem; font-weight: 700; }
+.legend-label i { font-size: 1.2rem; }
+.legend-meta { text-align: center; }
+.legend-meta strong { display: block; font-size: 1.15rem; color: #0F172A; font-weight: 800; margin-bottom: 2px; }
+.legend-meta span { display: block; color: var(--text-muted); font-size: 0.8rem; font-weight: 500; }
 
 .footer-strip { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 16px; border-top: 1px solid #E2E8F0; color: var(--text-muted); font-size: 0.9rem; }
 .footer-strip .link-blue { color: var(--primary-blue); font-weight: 600; }
