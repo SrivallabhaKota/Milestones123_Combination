@@ -56,8 +56,10 @@
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%);
 }
 .dash-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
   margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 18px rgba(30, 27, 75, 0.25);
 }
 
 .page-hero::before {
