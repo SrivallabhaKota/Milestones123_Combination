@@ -96,4 +96,27 @@
       if (particle.parentNode) particle.parentNode.removeChild(particle);
     }, 650);
   }
+
+  // Global sidebar toggle handler for floating hamburger menu
+  function initSidebarToggle() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    if (toggleBtn && sidebar) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
+          sidebar.classList.remove('open');
+        }
+      });
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarToggle);
+  } else {
+    initSidebarToggle();
+  }
 })();
