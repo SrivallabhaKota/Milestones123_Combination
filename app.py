@@ -6,7 +6,23 @@ import pymysql
 
 
 
+
+
+
+
+
+
+
+
 pymysql.install_as_MySQLdb()
+
+
+
+
+
+
+
+
 
 
 
@@ -22,7 +38,23 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 
 
 
+
+
+
+
+
+
+
+
 import bcrypt
+
+
+
+
+
+
+
+
 
 
 
@@ -38,7 +70,23 @@ import re
 
 
 
+
+
+
+
+
+
+
+
 from datetime import datetime, timedelta
+
+
+
+
+
+
+
+
 
 
 
@@ -54,7 +102,31 @@ from config import Config
 
 
 
+
+
+
+
+
+
+
+
 from functools import wraps
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -86,7 +158,31 @@ app = Flask(__name__)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # --- Custom Jinja Filter for Indian Rupee Formatting ---
+
+
+
+
+
+
+
+
 
 
 
@@ -102,7 +198,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -118,7 +230,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
         is_negative = float(value) < 0
+
+
+
+
+
+
+
+
 
 
 
@@ -134,7 +262,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
         s = str(val)
+
+
+
+
+
+
+
+
 
 
 
@@ -150,7 +294,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
             res = s
+
+
+
+
+
+
+
+
 
 
 
@@ -166,7 +326,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
             res = s[-3:]
+
+
+
+
+
+
+
+
 
 
 
@@ -182,7 +358,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
             while len(s) > 2:
+
+
+
+
+
+
+
+
 
 
 
@@ -198,7 +390,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
                 s = s[:-2]
+
+
+
+
+
+
+
+
 
 
 
@@ -214,7 +422,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
                 res = s + ',' + res
+
+
+
+
+
+
+
+
 
 
 
@@ -230,7 +454,23 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
     except:
+
+
+
+
+
+
+
+
 
 
 
@@ -254,7 +494,31 @@ def inr_format(value):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.jinja_env.filters['inr_format'] = inr_format
+
+
+
+
+
+
+
+
 
 
 
@@ -278,6 +542,22 @@ app.config.from_object(Config)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Starts database and tables
 
 
@@ -286,34 +566,70 @@ app.config.from_object(Config)
 
 
 
+
+
+
+
+
+
+
+
 def init_db():
+
     ssl_config = {}
+
     if app.config.get('MYSQL_SSL'):
+
         ssl_config = {'ssl': {}}
+
         
+
     try:
+
         conn = pymysql.connect(
+
             host=app.config['MYSQL_HOST'],
+
             port=int(app.config['MYSQL_PORT']),
+
             user=app.config['MYSQL_USER'],
+
             password=app.config['MYSQL_PASSWORD'],
+
             autocommit=True,
+
             **ssl_config
+
         )
+
         with conn.cursor() as cur:
+
             # Dynamically use MYSQL_DB
+
             db_name = app.config['MYSQL_DB']
+
             cur.execute(f"CREATE DATABASE IF NOT EXISTS {db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
+
         conn.close()
+
         
+
         conn = pymysql.connect(
+
             host=app.config['MYSQL_HOST'],
+
             port=int(app.config['MYSQL_PORT']),
+
             user=app.config['MYSQL_USER'],
+
             password=app.config['MYSQL_PASSWORD'],
+
             database=app.config['MYSQL_DB'],
+
             autocommit=True,
+
             **ssl_config
+
         )
 
 
@@ -322,7 +638,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -331,6 +663,14 @@ def init_db():
 
 
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -346,7 +686,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   id          INT AUTO_INCREMENT PRIMARY KEY,
+
+
+
+
+
+
+
+
 
 
 
@@ -362,7 +718,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   email       VARCHAR(100)  NOT NULL UNIQUE,
+
+
+
+
+
+
+
+
 
 
 
@@ -378,7 +750,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+
+
+
+
+
+
+
 
 
 
@@ -394,6 +782,14 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             ''')
 
 
@@ -402,7 +798,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -418,7 +830,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   id          INT AUTO_INCREMENT PRIMARY KEY,
+
+
+
+
+
+
+
+
 
 
 
@@ -434,7 +862,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   source      VARCHAR(100)  NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -450,7 +894,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   income_date DATE          NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -466,7 +926,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+
+
+
+
+
+
 
 
 
@@ -482,7 +958,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+
+
+
+
+
 
 
 
@@ -498,7 +990,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -514,7 +1022,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   id           INT AUTO_INCREMENT PRIMARY KEY,
+
+
+
+
+
+
+
+
 
 
 
@@ -530,7 +1054,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   category     VARCHAR(100)  NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -546,7 +1086,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   expense_date DATE          NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -562,7 +1118,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+
+
+
+
+
+
 
 
 
@@ -578,7 +1150,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+
+
+
+
+
 
 
 
@@ -594,7 +1182,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -610,7 +1214,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   id           INT AUTO_INCREMENT PRIMARY KEY,
+
+
+
+
+
+
+
+
 
 
 
@@ -626,7 +1246,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   category     VARCHAR(100)  NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -642,7 +1278,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   month        INT           NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -658,7 +1310,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   goal_id      INT           NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -674,7 +1342,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+
+
+
+
+
+
+
+
 
 
 
@@ -690,7 +1374,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+
+
+
+
+
 
 
 
@@ -706,7 +1406,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -722,7 +1438,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   id            INT AUTO_INCREMENT PRIMARY KEY,
+
+
+
+
+
+
+
+
 
 
 
@@ -738,7 +1470,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   source        VARCHAR(100)  NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -754,7 +1502,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   invest_date   DATE          NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -770,7 +1534,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   notes         VARCHAR(255),
+
+
+
+
+
+
+
+
 
 
 
@@ -786,7 +1566,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+
+
+
+
+
+
+
 
 
 
@@ -802,6 +1598,14 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             ''')
 
 
@@ -810,7 +1614,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -826,7 +1646,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   id              INT AUTO_INCREMENT PRIMARY KEY,
+
+
+
+
+
+
+
+
 
 
 
@@ -842,7 +1678,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   goal_name       VARCHAR(150)  NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -858,6 +1710,14 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   description     TEXT,
 
 
@@ -866,7 +1726,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   target_amount   DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+
+
+
+
+
+
+
+
 
 
 
@@ -882,7 +1758,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   start_date      DATE,
+
+
+
+
+
+
+
+
 
 
 
@@ -898,7 +1790,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   category        VARCHAR(50)   DEFAULT 'Personal',
+
+
+
+
+
+
+
+
 
 
 
@@ -914,7 +1822,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   status          VARCHAR(20)   NOT NULL DEFAULT 'Active',
+
+
+
+
+
+
+
+
 
 
 
@@ -930,7 +1854,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+
+
+
+
+
+
 
 
 
@@ -946,7 +1886,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+
+
+
+
+
+
+
 
 
 
@@ -962,6 +1918,14 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             ''')
 
 
@@ -970,7 +1934,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -986,6 +1966,14 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   id              INT AUTO_INCREMENT PRIMARY KEY,
 
 
@@ -994,7 +1982,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   goal_id         INT           NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -1010,7 +2014,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   target_amount   DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+
+
+
+
+
+
+
+
 
 
 
@@ -1026,7 +2046,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   due_date        DATE,
+
+
+
+
+
+
+
+
 
 
 
@@ -1042,7 +2078,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+
+
+
+
+
+
 
 
 
@@ -1058,7 +2110,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+
+
+
+
+
 
 
 
@@ -1074,7 +2142,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -1090,7 +2174,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   id              INT AUTO_INCREMENT PRIMARY KEY,
+
+
+
+
+
+
+
+
 
 
 
@@ -1106,7 +2206,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   amount          DECIMAL(12,2) NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -1122,7 +2238,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   note            VARCHAR(255),
+
+
+
+
+
+
+
+
 
 
 
@@ -1138,7 +2270,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
+
+
+
+
+
+
+
+
 
 
 
@@ -1154,7 +2302,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             ''')
+
+
+
+
+
+
+
+
 
 
 
@@ -1170,7 +2334,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                 CREATE TABLE IF NOT EXISTS user_profile (
+
+
+
+
+
+
+
+
 
 
 
@@ -1186,7 +2366,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   user_id                     INT NOT NULL UNIQUE,
+
+
+
+
+
+
+
+
 
 
 
@@ -1202,7 +2398,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   currency                    VARCHAR(10) DEFAULT '₹',
+
+
+
+
+
+
+
+
 
 
 
@@ -1218,7 +2430,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   monthly_investment_capacity DECIMAL(12,2) DEFAULT 0.00,
+
+
+
+
+
+
+
+
 
 
 
@@ -1234,7 +2462,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   created_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+
+
+
+
+
+
 
 
 
@@ -1250,7 +2494,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+
+
+
+
+
+
+
 
 
 
@@ -1266,7 +2526,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             ''')
+
+
+
+
+
+
+
+
 
 
 
@@ -1282,7 +2558,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
         # Migration: add goal_id to budget if missing
+
+
+
+
+
+
+
+
 
 
 
@@ -1298,7 +2590,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -1314,7 +2622,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                 if not cur.fetchone():
+
+
+
+
+
+
+
+
 
 
 
@@ -1330,7 +2654,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                     print("Migrated: budget.goal_id column added.")
+
+
+
+
+
+
+
+
 
 
 
@@ -1346,7 +2686,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
             print("Migration warning:", me)
+
+
+
+
+
+
+
+
 
 
 
@@ -1362,7 +2718,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
         try:
+
+
+
+
+
+
+
+
 
 
 
@@ -1378,7 +2750,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -1394,7 +2782,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                       id           INT AUTO_INCREMENT PRIMARY KEY,
+
+
+
+
+
+
+
+
 
 
 
@@ -1410,7 +2814,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                       alert_type   VARCHAR(60)  NOT NULL,
+
+
+
+
+
+
+
+
 
 
 
@@ -1426,7 +2846,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                       message      TEXT,
+
+
+
+
+
+
+
+
 
 
 
@@ -1442,7 +2878,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                       severity     VARCHAR(20)  DEFAULT 'info',
+
+
+
+
+
+
+
+
 
 
 
@@ -1458,7 +2910,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                       created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+
+
+
+
+
+
 
 
 
@@ -1474,7 +2942,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+
+
+
+
+
 
 
 
@@ -1490,7 +2974,23 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
         except Exception as ae:
+
+
+
+
+
+
+
+
 
 
 
@@ -1506,6 +3006,14 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
 
 
@@ -1514,7 +3022,31 @@ def init_db():
 
 
 
+
+
+
+
+
+
+
+
         print('ERROR: Database initialization error:', e)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1554,7 +3086,39 @@ init_db()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Gets database connection
+
+
+
+
+
+
+
+
 
 
 
@@ -1564,33 +3128,77 @@ init_db()
 
 def get_db_connection():
 
+
+
     ssl_config = {}
+
+
 
     if app.config.get('MYSQL_SSL'):
 
+
+
         ssl_config = {'ssl': {}} # PyMySQL enables SSL with an empty dict
+
+
 
     
 
+
+
     return pymysql.connect(
+
+
 
         host=app.config['MYSQL_HOST'],
 
+
+
         port=int(app.config['MYSQL_PORT']),
+
+
 
         user=app.config['MYSQL_USER'],
 
+
+
         password=app.config['MYSQL_PASSWORD'],
+
+
 
         database=app.config['MYSQL_DB'],
 
+
+
         cursorclass=pymysql.cursors.DictCursor,
+
+
 
         autocommit=True,
 
+
+
         **ssl_config
 
+
+
     )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1614,7 +3222,23 @@ def get_db_connection():
 
 
 
+
+
+
+
+
+
+
+
 def login_required(f):
+
+
+
+
+
+
+
+
 
 
 
@@ -1630,7 +3254,23 @@ def login_required(f):
 
 
 
+
+
+
+
+
+
+
+
     def decorated(*args, **kwargs):
+
+
+
+
+
+
+
+
 
 
 
@@ -1646,7 +3286,23 @@ def login_required(f):
 
 
 
+
+
+
+
+
+
+
+
             flash('Please log in to access this page.', 'warning')
+
+
+
+
+
+
+
+
 
 
 
@@ -1662,7 +3318,23 @@ def login_required(f):
 
 
 
+
+
+
+
+
+
+
+
         return f(*args, **kwargs)
+
+
+
+
+
+
+
+
 
 
 
@@ -1686,7 +3358,31 @@ def login_required(f):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Checks if email is valid
+
+
+
+
+
+
+
+
 
 
 
@@ -1702,7 +3398,23 @@ def is_valid_email(email: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
     pattern = '^[\\w\\.\\+\\-]+@[\\w\\-]+\\.[a-zA-Z]{2,}$'
+
+
+
+
+
+
+
+
 
 
 
@@ -1726,7 +3438,31 @@ def is_valid_email(email: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Checks if password is strong
+
+
+
+
+
+
+
+
 
 
 
@@ -1742,6 +3478,14 @@ def is_strong_password(password: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
     if len(password) < 8:
 
 
@@ -1750,7 +3494,23 @@ def is_strong_password(password: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
         return False
+
+
+
+
+
+
+
+
 
 
 
@@ -1766,7 +3526,23 @@ def is_strong_password(password: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
         return False
+
+
+
+
+
+
+
+
 
 
 
@@ -1782,7 +3558,23 @@ def is_strong_password(password: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
         return False
+
+
+
+
+
+
+
+
 
 
 
@@ -1798,7 +3590,23 @@ def is_strong_password(password: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
         return False
+
+
+
+
+
+
+
+
 
 
 
@@ -1814,7 +3622,23 @@ def is_strong_password(password: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
         return False
+
+
+
+
+
+
+
+
 
 
 
@@ -1838,7 +3662,31 @@ def is_strong_password(password: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/')
+
+
+
+
+
+
+
+
 
 
 
@@ -1854,7 +3702,23 @@ def is_strong_password(password: str) -> bool:
 
 
 
+
+
+
+
+
+
+
+
 # Shows home page
+
+
+
+
+
+
+
+
 
 
 
@@ -1870,6 +3734,14 @@ def home():
 
 
 
+
+
+
+
+
+
+
+
     if 'user_id' in session:
 
 
@@ -1878,7 +3750,23 @@ def home():
 
 
 
+
+
+
+
+
+
+
+
         return redirect(url_for('dashboard'))
+
+
+
+
+
+
+
+
 
 
 
@@ -1902,6 +3790,22 @@ def home():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Alias for home page
 
 
@@ -1910,7 +3814,23 @@ def home():
 
 
 
+
+
+
+
+
+
+
+
 def index():
+
+
+
+
+
+
+
+
 
 
 
@@ -1934,7 +3854,31 @@ def index():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/login', methods=['GET', 'POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -1950,7 +3894,23 @@ def index():
 
 
 
+
+
+
+
+
+
+
+
 def login_page():
+
+
+
+
+
+
+
+
 
 
 
@@ -1966,7 +3926,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
         return redirect(url_for('dashboard'))
+
+
+
+
+
+
+
+
 
 
 
@@ -1982,7 +3958,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
         email = request.form.get('email', '').strip().lower()
+
+
+
+
+
+
+
+
 
 
 
@@ -1998,7 +3990,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
         remember = request.form.get('remember')
+
+
+
+
+
+
+
+
 
 
 
@@ -2014,6 +4022,14 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             flash('All fields are required.', 'danger')
 
 
@@ -2022,7 +4038,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             return render_template('login.html')
+
+
+
+
+
+
+
+
 
 
 
@@ -2038,6 +4070,14 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             flash('Please enter a valid email address.', 'danger')
 
 
@@ -2046,7 +4086,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             return render_template('login.html')
+
+
+
+
+
+
+
+
 
 
 
@@ -2062,7 +4118,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -2078,7 +4150,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('SELECT id, name, email, password FROM users WHERE email = %s', (email,))
+
+
+
+
+
+
+
+
 
 
 
@@ -2094,7 +4182,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -2110,7 +4214,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             print('DB Error during login:', e)
+
+
+
+
+
+
+
+
 
 
 
@@ -2126,7 +4246,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             return render_template('login.html')
+
+
+
+
+
+
+
+
 
 
 
@@ -2142,7 +4278,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             session['user_id'] = user['id']
+
+
+
+
+
+
+
+
 
 
 
@@ -2158,7 +4310,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             session['user_email'] = user['email']
+
+
+
+
+
+
+
+
 
 
 
@@ -2174,7 +4342,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
                 app.permanent_session_lifetime = timedelta(days=30)
+
+
+
+
+
+
+
+
 
 
 
@@ -2190,7 +4374,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             flash(f"Welcome back, {user['name']}! 🎉", 'success')
+
+
+
+
+
+
+
+
 
 
 
@@ -2206,7 +4406,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
         else:
+
+
+
+
+
+
+
+
 
 
 
@@ -2222,7 +4438,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
             return render_template('login.html')
+
+
+
+
+
+
+
+
 
 
 
@@ -2246,7 +4478,31 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/register', methods=['GET', 'POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -2262,7 +4518,23 @@ def login_page():
 
 
 
+
+
+
+
+
+
+
+
 def register():
+
+
+
+
+
+
+
+
 
 
 
@@ -2278,7 +4550,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
         return redirect(url_for('dashboard'))
+
+
+
+
+
+
+
+
 
 
 
@@ -2294,7 +4582,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
         name = request.form.get('name', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -2310,7 +4614,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
         password = request.form.get('password', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -2326,7 +4646,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
         errors = []
+
+
+
+
+
+
+
+
 
 
 
@@ -2342,7 +4678,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Full name is required.')
+
+
+
+
+
+
+
+
 
 
 
@@ -2358,7 +4710,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Email address is required.')
+
+
+
+
+
+
+
+
 
 
 
@@ -2374,7 +4742,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Please enter a valid email address.')
+
+
+
+
+
+
+
+
 
 
 
@@ -2390,7 +4774,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Password is required.')
+
+
+
+
+
+
+
+
 
 
 
@@ -2406,7 +4806,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Password must be at least 8 characters with uppercase, lowercase, number, and special character.')
+
+
+
+
+
+
+
+
 
 
 
@@ -2422,7 +4838,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Passwords do not match.')
+
+
+
+
+
+
+
+
 
 
 
@@ -2438,7 +4870,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             for err in errors:
+
+
+
+
+
+
+
+
 
 
 
@@ -2454,7 +4902,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             return render_template('register.html')
+
+
+
+
+
+
+
+
 
 
 
@@ -2470,7 +4934,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -2486,7 +4966,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('SELECT id FROM users WHERE email = %s', (email,))
+
+
+
+
+
+
+
+
 
 
 
@@ -2502,7 +4998,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
                 if existing:
+
+
+
+
+
+
+
+
 
 
 
@@ -2518,7 +5030,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
                     flash('An account with this email already exists. Please log in.', 'warning')
+
+
+
+
+
+
+
+
 
 
 
@@ -2534,7 +5062,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
                 hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(rounds=12))
+
+
+
+
+
+
+
+
 
 
 
@@ -2550,7 +5094,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -2566,7 +5126,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             print('DB ERROR DURING REGISTRATION:', e)
+
+
+
+
+
+
+
+
 
 
 
@@ -2582,7 +5158,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
             return render_template('register.html')
+
+
+
+
+
+
+
+
 
 
 
@@ -2598,7 +5190,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
         return redirect(url_for('login_page'))
+
+
+
+
+
+
+
+
 
 
 
@@ -2622,7 +5230,31 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/dashboard')
+
+
+
+
+
+
+
+
 
 
 
@@ -2638,7 +5270,23 @@ def register():
 
 
 
+
+
+
+
+
+
+
+
 # Shows dashboard page
+
+
+
+
+
+
+
+
 
 
 
@@ -2654,7 +5302,23 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -2670,7 +5334,23 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
     user_email = session.get('user_email', '')
+
+
+
+
+
+
+
+
 
 
 
@@ -2686,7 +5366,23 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -2702,7 +5398,23 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -2718,7 +5430,23 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
             rows = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -2734,7 +5462,23 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -2750,7 +5494,23 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
         print("Error fetching dashboard goals:", e)
+
+
+
+
+
+
+
+
 
 
 
@@ -2774,7 +5534,31 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/logout')
+
+
+
+
+
+
+
+
 
 
 
@@ -2790,7 +5574,23 @@ def dashboard():
 
 
 
+
+
+
+
+
+
+
+
 # Logs out the user
+
+
+
+
+
+
+
+
 
 
 
@@ -2806,6 +5606,14 @@ def logout():
 
 
 
+
+
+
+
+
+
+
+
     session.clear()
 
 
@@ -2814,7 +5622,23 @@ def logout():
 
 
 
+
+
+
+
+
+
+
+
     flash('You have been logged out successfully.', 'info')
+
+
+
+
+
+
+
+
 
 
 
@@ -2838,7 +5662,31 @@ def logout():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/budget')
+
+
+
+
+
+
+
+
 
 
 
@@ -2854,7 +5702,23 @@ def logout():
 
 
 
+
+
+
+
+
+
+
+
 # Alias for budget view
+
+
+
+
+
+
+
+
 
 
 
@@ -2870,6 +5734,14 @@ def budget():
 
 
 
+
+
+
+
+
+
+
+
     user_name = session.get('user_name', 'User')
 
 
@@ -2878,7 +5750,23 @@ def budget():
 
 
 
+
+
+
+
+
+
+
+
     user_email = session.get('user_email', '')
+
+
+
+
+
+
+
+
 
 
 
@@ -2902,7 +5790,31 @@ def budget():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/forgot-password')
+
+
+
+
+
+
+
+
 
 
 
@@ -2918,6 +5830,14 @@ def budget():
 
 
 
+
+
+
+
+
+
+
+
 def forgot_password():
 
 
@@ -2926,7 +5846,23 @@ def forgot_password():
 
 
 
+
+
+
+
+
+
+
+
     flash('Password reset feature coming soon. Contact support for help.', 'info')
+
+
+
+
+
+
+
+
 
 
 
@@ -2950,7 +5886,31 @@ def forgot_password():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/api/dashboard-summary')
+
+
+
+
+
+
+
+
 
 
 
@@ -2966,7 +5926,23 @@ def forgot_password():
 
 
 
+
+
+
+
+
+
+
+
 # API: gets dashboard stats
+
+
+
+
+
+
+
+
 
 
 
@@ -2982,7 +5958,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -2998,7 +5990,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -3014,7 +6022,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT COALESCE(SUM(amount), 0) AS total FROM income WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3030,7 +6054,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT COALESCE(SUM(amount), 0) AS total FROM expenses WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3046,7 +6086,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT COALESCE(SUM(amount), 0) AS total FROM investments WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3062,7 +6118,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -3078,7 +6150,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
         remaining_balance = max(0, total_income - total_expenses - total_investments - total_savings)
+
+
+
+
+
+
+
+
 
 
 
@@ -3094,7 +6182,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
         if total_income > 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -3110,7 +6214,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             savings_pct = round(total_savings / total_income * 100)
+
+
+
+
+
+
+
+
 
 
 
@@ -3126,7 +6246,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             remaining_pct = max(0, 100 - expenses_pct - savings_pct - investments_pct)
+
+
+
+
+
+
+
+
 
 
 
@@ -3142,7 +6278,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             expenses_pct = savings_pct = investments_pct = remaining_pct = 0
+
+
+
+
+
+
+
+
 
 
 
@@ -3158,7 +6310,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
         prev_month = datetime.now().replace(day=1) - timedelta(days=1)
+
+
+
+
+
+
+
+
 
 
 
@@ -3174,7 +6342,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             conn2 = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -3190,7 +6374,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('SELECT COALESCE(SUM(amount),0) AS t FROM income WHERE user_id=%s AND MONTH(income_date)=MONTH(CURDATE()) AND YEAR(income_date)=YEAR(CURDATE())', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3206,7 +6406,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('SELECT COALESCE(SUM(amount),0) AS t FROM income WHERE user_id=%s AND MONTH(income_date)=%s AND YEAR(income_date)=%s', (user_id, prev_month.month, prev_month.year))
+
+
+
+
+
+
+
+
 
 
 
@@ -3222,7 +6438,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('SELECT COALESCE(SUM(amount),0) AS t FROM expenses WHERE user_id=%s AND MONTH(expense_date)=MONTH(CURDATE()) AND YEAR(expense_date)=YEAR(CURDATE())', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3238,7 +6470,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('SELECT COALESCE(SUM(amount),0) AS t FROM expenses WHERE user_id=%s AND MONTH(expense_date)=%s AND YEAR(expense_date)=%s', (user_id, prev_month.month, prev_month.year))
+
+
+
+
+
+
+
+
 
 
 
@@ -3254,7 +6502,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('SELECT COALESCE(SUM(amount),0) AS t FROM investments WHERE user_id=%s AND MONTH(invest_date)=MONTH(CURDATE()) AND YEAR(invest_date)=YEAR(CURDATE())', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3270,7 +6534,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('SELECT COALESCE(SUM(amount),0) AS t FROM investments WHERE user_id=%s AND MONTH(invest_date)=%s AND YEAR(invest_date)=%s', (user_id, prev_month.month, prev_month.year))
+
+
+
+
+
+
+
+
 
 
 
@@ -3286,7 +6566,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             conn2.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -3302,7 +6598,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 if prev_val > 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -3318,7 +6630,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 return 0
+
+
+
+
+
+
+
+
 
 
 
@@ -3334,7 +6662,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             expenses_change = pct_change(cur_expenses, prev_expenses)
+
+
+
+
+
+
+
+
 
 
 
@@ -3350,7 +6694,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             cur_savings = min(cur_income * 0.25, max(0, cur_income - cur_expenses - cur_invest))
+
+
+
+
+
+
+
+
 
 
 
@@ -3366,7 +6726,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             savings_change = pct_change(cur_savings, prev_savings)
+
+
+
+
+
+
+
+
 
 
 
@@ -3382,7 +6758,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             income_change = expenses_change = savings_change = invest_change = 0
+
+
+
+
+
+
+
+
 
 
 
@@ -3398,7 +6790,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             'income':      {'total': total_income,      'change': income_change},
+
+
+
+
+
+
+
+
 
 
 
@@ -3414,7 +6822,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             'savings':     {'total': total_savings,     'change': savings_change},
+
+
+
+
+
+
+
+
 
 
 
@@ -3430,7 +6854,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             'remaining':   {'total': remaining_balance},
+
+
+
+
+
+
+
+
 
 
 
@@ -3446,7 +6886,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 'expenses': expenses_pct,
+
+
+
+
+
+
+
+
 
 
 
@@ -3462,7 +6918,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
                 'investments': investments_pct,
+
+
+
+
+
+
+
+
 
 
 
@@ -3478,7 +6950,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
             }
+
+
+
+
+
+
+
+
 
 
 
@@ -3494,6 +6982,14 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
 
 
@@ -3502,7 +6998,31 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': str(e)}), 500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3526,7 +7046,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -3542,7 +7078,23 @@ def api_dashboard_summary():
 
 
 
+
+
+
+
+
+
+
+
 def api_user_profile():
+
+
+
+
+
+
+
+
 
 
 
@@ -3566,7 +7118,31 @@ def api_user_profile():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/api/recent-transactions')
+
+
+
+
+
+
+
+
 
 
 
@@ -3582,7 +7158,23 @@ def api_user_profile():
 
 
 
+
+
+
+
+
+
+
+
 # API: gets recent transactions
+
+
+
+
+
+
+
+
 
 
 
@@ -3598,7 +7190,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -3614,7 +7222,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -3630,7 +7254,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT id, source AS title, 'Income' AS category, amount, income_date AS date, 'income' AS type, created_at FROM income WHERE user_id = %s", (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3646,7 +7286,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT id, category AS title, 'Expense' AS category, amount, expense_date AS date, 'expense' AS type, created_at FROM expenses WHERE user_id = %s", (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3662,7 +7318,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT id, source AS title, invest_type AS category, amount, invest_date AS date, 'investment' AS type, created_at FROM investments WHERE user_id = %s", (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -3678,7 +7350,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -3694,7 +7382,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
         transactions.sort(key=lambda x: x['created_at'], reverse=True)
+
+
+
+
+
+
+
+
 
 
 
@@ -3710,7 +7414,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
         result = []
+
+
+
+
+
+
+
+
 
 
 
@@ -3726,7 +7446,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
             result.append({'title': t['title'], 'category': t['category'], 'amount': float(t['amount']), 'type': t['type'], 'date': str(t['date'])})
+
+
+
+
+
+
+
+
 
 
 
@@ -3742,6 +7478,14 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
 
 
@@ -3750,7 +7494,31 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': str(e)}), 500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3774,7 +7542,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -3790,7 +7574,23 @@ def api_recent_transactions():
 
 
 
+
+
+
+
+
+
+
+
 def api_monthly_spending():
+
+
+
+
+
+
+
+
 
 
 
@@ -3806,7 +7606,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -3822,7 +7638,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -3838,7 +7670,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
                 SELECT MONTHNAME(expense_date) AS month, SUM(amount) AS total 
+
+
+
+
+
+
+
+
 
 
 
@@ -3854,7 +7702,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
                 WHERE user_id = %s AND expense_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+
+
+
+
+
+
+
+
 
 
 
@@ -3870,7 +7734,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
                 ORDER BY MIN(expense_date) ASC
+
+
+
+
+
+
+
+
 
 
 
@@ -3886,7 +7766,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
             rows = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -3902,7 +7798,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
         labels = [r['month'][:3] for r in rows] if rows else ['No Data']
+
+
+
+
+
+
+
+
 
 
 
@@ -3918,7 +7830,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify({'labels': labels, 'values': values})
+
+
+
+
+
+
+
+
 
 
 
@@ -3934,7 +7862,31 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': str(e)}), 500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3958,7 +7910,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -3974,7 +7942,23 @@ def api_monthly_spending():
 
 
 
+
+
+
+
+
+
+
+
 def api_insights():
+
+
+
+
+
+
+
+
 
 
 
@@ -3990,7 +7974,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -4006,7 +8006,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -4022,7 +8038,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             monthly_spent = float(cur.fetchone()['total'])
+
+
+
+
+
+
+
+
 
 
 
@@ -4038,7 +8070,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             total_budget = float(cur.fetchone()['total_budget'])
+
+
+
+
+
+
+
+
 
 
 
@@ -4054,7 +8102,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             monthly_income = float(cur.fetchone()['total'])
+
+
+
+
+
+
+
+
 
 
 
@@ -4070,7 +8134,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
         if total_budget > 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -4086,7 +8166,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             if budget_pct > 100:
+
+
+
+
+
+
+
+
 
 
 
@@ -4102,7 +8198,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
                 budget_desc = f'Spending is {budget_pct - 100}% over plan'
+
+
+
+
+
+
+
+
 
 
 
@@ -4118,7 +8230,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             else:
+
+
+
+
+
+
+
+
 
 
 
@@ -4134,7 +8262,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
                 budget_desc = f'Spending is {100 - budget_pct}% below plan'
+
+
+
+
+
+
+
+
 
 
 
@@ -4150,7 +8294,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
         else:
+
+
+
+
+
+
+
+
 
 
 
@@ -4166,7 +8326,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             budget_status = 'No Budget Set'
+
+
+
+
+
+
+
+
 
 
 
@@ -4182,7 +8358,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             budget_color = '#94A3B8'
+
+
+
+
+
+
+
+
 
 
 
@@ -4198,7 +8390,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             savings = max(0, monthly_income - monthly_spent)
+
+
+
+
+
+
+
+
 
 
 
@@ -4214,7 +8422,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             savings_status = f'{savings_rate}% Saved'
+
+
+
+
+
+
+
+
 
 
 
@@ -4230,7 +8454,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
         else:
+
+
+
+
+
+
+
+
 
 
 
@@ -4246,7 +8486,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
             savings_status = '0% Saved'
+
+
+
+
+
+
+
+
 
 
 
@@ -4262,7 +8518,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify([{'title': 'Budget Status', 'status': budget_status, 'description': budget_desc, 'percentage': budget_pct, 'color': budget_color}, {'title': 'Savings Rate', 'status': savings_status, 'description': savings_desc, 'percentage': savings_rate, 'color': '#10B981'}, {'title': 'Investment Growth', 'status': '+0%', 'description': 'Tracking coming soon', 'percentage': 0, 'color': '#8B5CF6'}, {'title': 'Monthly Spending', 'status': f'₹{monthly_spent:,.0f}', 'description': 'Total spent this month', 'percentage': min(100, monthly_spent / max(1, monthly_income) * 100) if monthly_income > 0 else 0, 'color': '#3B82F6'}])
+
+
+
+
+
+
+
+
 
 
 
@@ -4278,7 +8550,31 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': str(e)}), 500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4302,7 +8598,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -4318,7 +8630,23 @@ def api_insights():
 
 
 
+
+
+
+
+
+
+
+
 def view_all():
+
+
+
+
+
+
+
+
 
 
 
@@ -4342,7 +8670,31 @@ def view_all():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/view-detailed-report')
+
+
+
+
+
+
+
+
 
 
 
@@ -4358,6 +8710,14 @@ def view_all():
 
 
 
+
+
+
+
+
+
+
+
 # Placeholder: view reports
 
 
@@ -4366,7 +8726,23 @@ def view_all():
 
 
 
+
+
+
+
+
+
+
+
 def view_detailed_report():
+
+
+
+
+
+
+
+
 
 
 
@@ -4390,7 +8766,31 @@ def view_detailed_report():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/quick-actions/expense')
+
+
+
+
+
+
+
+
 
 
 
@@ -4406,6 +8806,14 @@ def view_detailed_report():
 
 
 
+
+
+
+
+
+
+
+
 # Placeholder: add expense
 
 
@@ -4414,7 +8822,23 @@ def view_detailed_report():
 
 
 
+
+
+
+
+
+
+
+
 def quick_action_expense():
+
+
+
+
+
+
+
+
 
 
 
@@ -4438,7 +8862,31 @@ def quick_action_expense():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/quick-actions/budget')
+
+
+
+
+
+
+
+
 
 
 
@@ -4454,6 +8902,14 @@ def quick_action_expense():
 
 
 
+
+
+
+
+
+
+
+
 # Placeholder: add budget
 
 
@@ -4462,7 +8918,23 @@ def quick_action_expense():
 
 
 
+
+
+
+
+
+
+
+
 def quick_action_budget():
+
+
+
+
+
+
+
+
 
 
 
@@ -4486,7 +8958,31 @@ def quick_action_budget():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/quick-actions/investment')
+
+
+
+
+
+
+
+
 
 
 
@@ -4502,6 +8998,14 @@ def quick_action_budget():
 
 
 
+
+
+
+
+
+
+
+
 # Placeholder: add investment
 
 
@@ -4510,7 +9014,23 @@ def quick_action_budget():
 
 
 
+
+
+
+
+
+
+
+
 def quick_action_investment():
+
+
+
+
+
+
+
+
 
 
 
@@ -4534,7 +9054,31 @@ def quick_action_investment():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/quick-actions/report')
+
+
+
+
+
+
+
+
 
 
 
@@ -4550,6 +9094,14 @@ def quick_action_investment():
 
 
 
+
+
+
+
+
+
+
+
 # Placeholder: get reports
 
 
@@ -4558,7 +9110,23 @@ def quick_action_investment():
 
 
 
+
+
+
+
+
+
+
+
 def quick_action_report():
+
+
+
+
+
+
+
+
 
 
 
@@ -4582,7 +9150,31 @@ def quick_action_report():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/api/income', methods=['GET'])
+
+
+
+
+
+
+
+
 
 
 
@@ -4598,7 +9190,23 @@ def quick_action_report():
 
 
 
+
+
+
+
+
+
+
+
 # API: gets income list
+
+
+
+
+
+
+
+
 
 
 
@@ -4614,7 +9222,23 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -4630,7 +9254,23 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -4646,7 +9286,23 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT id, source, amount, income_date, notes, created_at FROM income WHERE user_id = %s ORDER BY created_at DESC', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -4662,7 +9318,23 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -4678,7 +9350,23 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
         for row in rows:
+
+
+
+
+
+
+
+
 
 
 
@@ -4694,7 +9382,23 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify(result), 200)
+
+
+
+
+
+
+
+
 
 
 
@@ -4710,7 +9414,31 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': str(e)}), 500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4734,7 +9462,23 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -4750,7 +9494,23 @@ def api_get_income():
 
 
 
+
+
+
+
+
+
+
+
 def api_create_income():
+
+
+
+
+
+
+
+
 
 
 
@@ -4766,7 +9526,23 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
     required = ['source', 'amount', 'income_date']
+
+
+
+
+
+
+
+
 
 
 
@@ -4782,7 +9558,23 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': f'Missing required fields: {required}'}), 400)
+
+
+
+
+
+
+
+
 
 
 
@@ -4798,7 +9590,23 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -4814,7 +9622,23 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -4830,7 +9654,23 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
             new_id = cur.lastrowid
+
+
+
+
+
+
+
+
 
 
 
@@ -4846,7 +9686,23 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'id': new_id, 'message': 'Income record created successfully'}), 201)
+
+
+
+
+
+
+
+
 
 
 
@@ -4862,7 +9718,31 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': str(e)}), 500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4886,7 +9766,23 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -4902,7 +9798,23 @@ def api_create_income():
 
 
 
+
+
+
+
+
+
+
+
 def api_get_expenses():
+
+
+
+
+
+
+
+
 
 
 
@@ -4918,7 +9830,23 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -4934,7 +9862,23 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -4950,7 +9894,23 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
             rows = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -4966,7 +9926,23 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
         result = []
+
+
+
+
+
+
+
+
 
 
 
@@ -4982,7 +9958,23 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
             result.append({'id': row['id'], 'category': row['category'], 'amount': float(row['amount']), 'expense_date': str(row['expense_date']), 'notes': row['notes'], 'created_at': str(row['created_at'])})
+
+
+
+
+
+
+
+
 
 
 
@@ -4998,6 +9990,14 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
 
 
@@ -5006,7 +10006,31 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': str(e)}), 500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5030,7 +10054,23 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -5046,7 +10086,23 @@ def api_get_expenses():
 
 
 
+
+
+
+
+
+
+
+
 def api_create_expense():
+
+
+
+
+
+
+
+
 
 
 
@@ -5062,7 +10118,23 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
     required = ['category', 'amount', 'expense_date']
+
+
+
+
+
+
+
+
 
 
 
@@ -5078,7 +10150,23 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': f'Missing required fields: {required}'}), 400)
+
+
+
+
+
+
+
+
 
 
 
@@ -5094,7 +10182,23 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -5110,7 +10214,23 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -5126,7 +10246,23 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
             new_id = cur.lastrowid
+
+
+
+
+
+
+
+
 
 
 
@@ -5142,7 +10278,23 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'id': new_id, 'message': 'Expense record created successfully'}), 201)
+
+
+
+
+
+
+
+
 
 
 
@@ -5158,7 +10310,31 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'error': str(e)}), 500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5182,7 +10358,23 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -5198,7 +10390,23 @@ def api_create_expense():
 
 
 
+
+
+
+
+
+
+
+
 def api_get_budget():
+
+
+
+
+
+
+
+
 
 
 
@@ -5214,7 +10422,23 @@ def api_get_budget():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -5230,7 +10454,23 @@ def api_get_budget():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -5246,7 +10486,23 @@ def api_get_budget():
 
 
 
+
+
+
+
+
+
+
+
             rows = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -5262,7 +10518,23 @@ def api_get_budget():
 
 
 
+
+
+
+
+
+
+
+
         result = []
+
+
+
+
+
+
+
+
 
 
 
@@ -5278,7 +10550,23 @@ def api_get_budget():
 
 
 
+
+
+
+
+
+
+
+
             result.append({'id': row['id'], 'category': row['category'], 'limit_amount': float(row['limit_amount']), 'month': row['month'], 'year': row['year'], 'created_at': str(row['created_at'])})
+
+
+
+
+
+
+
+
 
 
 
@@ -5294,7 +10582,23 @@ def api_get_budget():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -5318,7 +10622,31 @@ def api_get_budget():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/api/budget', methods=['POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -5334,7 +10662,23 @@ def api_get_budget():
 
 
 
+
+
+
+
+
+
+
+
 # API: adds new budget
+
+
+
+
+
+
+
+
 
 
 
@@ -5350,7 +10694,23 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
     data = request.get_json()
+
+
+
+
+
+
+
+
 
 
 
@@ -5366,7 +10726,23 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
     if not all((k in data for k in required)):
+
+
+
+
+
+
+
+
 
 
 
@@ -5382,7 +10758,23 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -5398,7 +10790,23 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -5414,7 +10822,23 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('INSERT INTO budget (user_id, category, limit_amount, month, year) VALUES (%s, %s, %s, %s, %s)', (user_id, data['category'], data['limit_amount'], data['month'], data['year']))
+
+
+
+
+
+
+
+
 
 
 
@@ -5430,7 +10854,23 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -5446,7 +10886,23 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -5470,7 +10926,31 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/add-income', methods=['GET', 'POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -5486,7 +10966,23 @@ def api_create_budget():
 
 
 
+
+
+
+
+
+
+
+
 # Form page: adds income
+
+
+
+
+
+
+
+
 
 
 
@@ -5502,7 +10998,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
     error = None
+
+
+
+
+
+
+
+
 
 
 
@@ -5518,7 +11030,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
         source = request.form.get('source', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -5534,7 +11062,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
         income_date = request.form.get('income_date', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -5550,7 +11094,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
         if not source or not amount_str or not income_date:
+
+
+
+
+
+
+
+
 
 
 
@@ -5566,6 +11126,14 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
         else:
 
 
@@ -5574,7 +11142,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
             try:
+
+
+
+
+
+
+
+
 
 
 
@@ -5590,7 +11174,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
                 if amount <= 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -5606,7 +11206,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
             except ValueError:
+
+
+
+
+
+
+
+
 
 
 
@@ -5622,7 +11238,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
         if not error:
+
+
+
+
+
+
+
+
 
 
 
@@ -5638,7 +11270,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
                 conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -5654,7 +11302,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute('INSERT INTO income (user_id, source, amount, income_date, notes) VALUES (%s, %s, %s, %s, %s)', (session.get('user_id'), source, amount, income_date, notes))
+
+
+
+
+
+
+
+
 
 
 
@@ -5670,7 +11334,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
                 flash('Income record added successfully!', 'success')
+
+
+
+
+
+
+
+
 
 
 
@@ -5686,6 +11366,14 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
             except Exception as e:
 
 
@@ -5694,7 +11382,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
                 error = f'Database error: {str(e)}'
+
+
+
+
+
+
+
+
 
 
 
@@ -5718,7 +11422,31 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/add-expense', methods=['GET', 'POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -5734,7 +11462,23 @@ def add_income():
 
 
 
+
+
+
+
+
+
+
+
 # Form page: adds expense
+
+
+
+
+
+
+
+
 
 
 
@@ -5750,7 +11494,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
     error = None
+
+
+
+
+
+
+
+
 
 
 
@@ -5766,7 +11526,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
         category = request.form.get('category', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -5782,7 +11558,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
         expense_date = request.form.get('expense_date', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -5798,7 +11590,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
         if not category or not amount_str or not expense_date:
+
+
+
+
+
+
+
+
 
 
 
@@ -5814,6 +11622,14 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
         else:
 
 
@@ -5822,7 +11638,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
             try:
+
+
+
+
+
+
+
+
 
 
 
@@ -5838,7 +11670,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
                 if amount <= 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -5854,7 +11702,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
             except ValueError:
+
+
+
+
+
+
+
+
 
 
 
@@ -5870,7 +11734,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
         if not error:
+
+
+
+
+
+
+
+
 
 
 
@@ -5886,7 +11766,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
                 conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -5902,7 +11798,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute('INSERT INTO expenses (user_id, category, amount, expense_date, notes) VALUES (%s, %s, %s, %s, %s)', (session.get('user_id'), category, amount, expense_date, notes))
+
+
+
+
+
+
+
+
 
 
 
@@ -5918,7 +11830,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
                 flash('Expense record added successfully!', 'success')
+
+
+
+
+
+
+
+
 
 
 
@@ -5934,6 +11862,14 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
             except Exception as e:
 
 
@@ -5942,7 +11878,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
                 error = f'Database error: {str(e)}'
+
+
+
+
+
+
+
+
 
 
 
@@ -5966,7 +11918,31 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/add-budget', methods=['GET', 'POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -5982,7 +11958,23 @@ def add_expense():
 
 
 
+
+
+
+
+
+
+
+
 # Form page: adds budget
+
+
+
+
+
+
+
+
 
 
 
@@ -5998,7 +11990,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
     error = None
+
+
+
+
+
+
+
+
 
 
 
@@ -6014,7 +12022,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
         category = request.form.get('category', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -6030,7 +12054,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
         month_str = request.form.get('month', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -6046,7 +12086,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
         if not category or not amount_str or not month_str or not year_str:
+
+
+
+
+
+
+
+
 
 
 
@@ -6062,6 +12118,14 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
         else:
 
 
@@ -6070,7 +12134,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
             try:
+
+
+
+
+
+
+
+
 
 
 
@@ -6086,7 +12166,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                 month = int(month_str)
+
+
+
+
+
+
+
+
 
 
 
@@ -6102,7 +12198,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                 if limit_amount <= 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -6118,7 +12230,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                 elif not 1 <= month <= 12:
+
+
+
+
+
+
+
+
 
 
 
@@ -6134,7 +12262,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
             except ValueError:
+
+
+
+
+
+
+
+
 
 
 
@@ -6150,7 +12294,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
         if not error:
+
+
+
+
+
+
+
+
 
 
 
@@ -6166,7 +12326,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                 goal_id = request.form.get('goal_id') or None
+
+
+
+
+
+
+
+
 
 
 
@@ -6182,7 +12358,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                     goal_id = int(goal_id)
+
+
+
+
+
+
+
+
 
 
 
@@ -6198,7 +12390,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                 with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -6214,7 +12422,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                 conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -6230,7 +12454,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                 return redirect(url_for('dashboard'))
+
+
+
+
+
+
+
+
 
 
 
@@ -6246,7 +12486,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
                 error = f'Could not create budget (it may already exist for this category/month): {str(e)}'
+
+
+
+
+
+
+
+
 
 
 
@@ -6262,7 +12518,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
     active_goals = []
+
+
+
+
+
+
+
+
 
 
 
@@ -6278,7 +12550,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -6294,7 +12582,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT id, goal_name, category FROM goals WHERE user_id=%s AND status='Active' ORDER BY goal_name ASC", (session.get('user_id'),))
+
+
+
+
+
+
+
+
 
 
 
@@ -6310,7 +12614,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -6326,7 +12646,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
         pass
+
+
+
+
+
+
+
+
 
 
 
@@ -6358,7 +12694,39 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/add-investment', methods=['GET', 'POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -6374,7 +12742,23 @@ def add_budget():
 
 
 
+
+
+
+
+
+
+
+
 # Form page: adds investment
+
+
+
+
+
+
+
+
 
 
 
@@ -6390,7 +12774,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
     error = None
+
+
+
+
+
+
+
+
 
 
 
@@ -6406,7 +12806,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
         source = request.form.get('source', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -6422,7 +12838,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
         invest_date = request.form.get('invest_date', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -6438,7 +12870,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
         notes = request.form.get('notes', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -6454,7 +12902,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
             error = 'Source, Amount, and Date are required fields.'
+
+
+
+
+
+
+
+
 
 
 
@@ -6470,7 +12934,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
             try:
+
+
+
+
+
+
+
+
 
 
 
@@ -6486,7 +12966,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
                 if amount <= 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -6502,7 +12998,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
             except ValueError:
+
+
+
+
+
+
+
+
 
 
 
@@ -6518,7 +13030,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
         if not error:
+
+
+
+
+
+
+
+
 
 
 
@@ -6534,7 +13062,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
                 conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -6550,7 +13094,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -6566,7 +13126,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
                         (session.get('user_id'), source, amount, invest_date, invest_type, notes)
+
+
+
+
+
+
+
+
 
 
 
@@ -6582,7 +13158,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
                 conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -6598,7 +13190,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
                 return redirect(url_for('dashboard'))
+
+
+
+
+
+
+
+
 
 
 
@@ -6614,7 +13222,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
                 error = f'Database error: {str(e)}'
+
+
+
+
+
+
+
+
 
 
 
@@ -6638,7 +13262,31 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/api/balance-summary')
+
+
+
+
+
+
+
+
 
 
 
@@ -6654,7 +13302,23 @@ def add_investment():
 
 
 
+
+
+
+
+
+
+
+
 # API: gets total balance
+
+
+
+
+
+
+
+
 
 
 
@@ -6670,7 +13334,23 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -6686,7 +13366,23 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -6702,7 +13398,23 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT COALESCE(SUM(amount), 0) AS total FROM income WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -6718,7 +13430,23 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT COALESCE(SUM(amount), 0) AS total FROM expenses WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -6734,7 +13462,23 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -6750,6 +13494,14 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
         return (jsonify({'total_income': total_income, 'total_expenses': total_expenses, 'balance': balance}), 200)
 
 
@@ -6758,7 +13510,23 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -6782,7 +13550,31 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/api/reset-data', methods=['POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -6798,7 +13590,23 @@ def api_balance_summary():
 
 
 
+
+
+
+
+
+
+
+
 # API: resets all data to 0
+
+
+
+
+
+
+
+
 
 
 
@@ -6814,7 +13622,23 @@ def api_reset_data():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -6830,7 +13654,23 @@ def api_reset_data():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -6846,7 +13686,23 @@ def api_reset_data():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('DELETE FROM income WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -6862,7 +13718,23 @@ def api_reset_data():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('DELETE FROM budget WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -6878,7 +13750,23 @@ def api_reset_data():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -6894,7 +13782,23 @@ def api_reset_data():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -6926,7 +13830,39 @@ def api_reset_data():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -6942,7 +13878,31 @@ def api_reset_data():
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6966,6 +13926,14 @@ GOAL_CATEGORIES = ['Education', 'Electronics', 'Travel', 'Emergency',
 
 
 
+
+
+
+
+
+
+
+
                    'Vehicle', 'Personal', 'Health', 'Other']
 
 
@@ -6974,7 +13942,23 @@ GOAL_CATEGORIES = ['Education', 'Electronics', 'Travel', 'Emergency',
 
 
 
+
+
+
+
+
+
+
+
 GOAL_PRIORITIES = ['High', 'Medium', 'Low']
+
+
+
+
+
+
+
+
 
 
 
@@ -6998,7 +13982,31 @@ GOAL_STATUSES   = ['Active', 'Completed', 'On Hold']
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def _parse_date(s):
+
+
+
+
+
+
+
+
 
 
 
@@ -7014,7 +14022,23 @@ def _parse_date(s):
 
 
 
+
+
+
+
+
+
+
+
         return None
+
+
+
+
+
+
+
+
 
 
 
@@ -7030,7 +14054,23 @@ def _parse_date(s):
 
 
 
+
+
+
+
+
+
+
+
         try:
+
+
+
+
+
+
+
+
 
 
 
@@ -7046,6 +14086,14 @@ def _parse_date(s):
 
 
 
+
+
+
+
+
+
+
+
         except ValueError:
 
 
@@ -7054,7 +14102,23 @@ def _parse_date(s):
 
 
 
+
+
+
+
+
+
+
+
             continue
+
+
+
+
+
+
+
+
 
 
 
@@ -7078,7 +14142,31 @@ def _parse_date(s):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def process_goal(row):
+
+
+
+
+
+
+
+
 
 
 
@@ -7094,7 +14182,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     g = dict(row)
+
+
+
+
+
+
+
+
 
 
 
@@ -7110,7 +14214,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     current_amount = float(g.get('current_amount') or 0)
+
+
+
+
+
+
+
+
 
 
 
@@ -7126,7 +14246,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     target_date_str = g.get('target_date')
+
+
+
+
+
+
+
+
 
 
 
@@ -7142,7 +14278,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     start_date  = _parse_date(str(start_date_str)) if start_date_str else None
+
+
+
+
+
+
+
+
 
 
 
@@ -7158,7 +14310,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     remaining    = max(target_amount - current_amount, 0)
+
+
+
+
+
+
+
+
 
 
 
@@ -7174,7 +14342,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     days_left = (target_date - today).days if target_date else None
+
+
+
+
+
+
+
+
 
 
 
@@ -7190,6 +14374,14 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         months_left = max((target_date - today).days / 30.44, 0)
 
 
@@ -7198,7 +14390,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     else:
+
+
+
+
+
+
+
+
 
 
 
@@ -7214,7 +14422,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     required_monthly = round(remaining / months_left, 2) if months_left > 0 else 0
+
+
+
+
+
+
+
+
 
 
 
@@ -7230,7 +14454,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     # Smart status
+
+
+
+
+
+
+
+
 
 
 
@@ -7246,7 +14486,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         smart_status = 'Completed'
+
+
+
+
+
+
+
+
 
 
 
@@ -7262,7 +14518,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         total_days   = (target_date - start_date).days
+
+
+
+
+
+
+
+
 
 
 
@@ -7278,7 +14550,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         if total_days > 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -7294,7 +14582,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
             expected = target_amount * ratio
+
+
+
+
+
+
+
+
 
 
 
@@ -7310,7 +14614,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
                 smart_status = 'On Track'
+
+
+
+
+
+
+
+
 
 
 
@@ -7326,7 +14646,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
                 smart_status = 'Needs Attention'
+
+
+
+
+
+
+
+
 
 
 
@@ -7342,7 +14678,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
                 smart_status = 'Behind Schedule'
+
+
+
+
+
+
+
+
 
 
 
@@ -7358,7 +14710,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
             smart_status = 'Behind Schedule'
+
+
+
+
+
+
+
+
 
 
 
@@ -7374,7 +14742,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         smart_status = g.get('status', 'Active')
+
+
+
+
+
+
+
+
 
 
 
@@ -7390,7 +14774,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
                     'Needs Attention': 'warning', 'Behind Schedule': 'danger'}.get(smart_status, 'secondary')
+
+
+
+
+
+
+
+
 
 
 
@@ -7406,7 +14806,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     status_cls   = {'Active': 'primary', 'Completed': 'success', 'On Hold': 'secondary'}.get(g.get('status', 'Active'), 'secondary')
+
+
+
+
+
+
+
+
 
 
 
@@ -7422,7 +14838,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         'remaining_amount':        remaining,
+
+
+
+
+
+
+
+
 
 
 
@@ -7438,7 +14870,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         'required_monthly_saving': required_monthly,
+
+
+
+
+
+
+
+
 
 
 
@@ -7454,7 +14902,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         'days_left':               days_left,
+
+
+
+
+
+
+
+
 
 
 
@@ -7470,7 +14934,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         'smart_status':            smart_status,
+
+
+
+
+
+
+
+
 
 
 
@@ -7486,7 +14966,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
         'priority_class':          priority_cls,
+
+
+
+
+
+
+
+
 
 
 
@@ -7502,7 +14998,23 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
     })
+
+
+
+
+
+
+
+
 
 
 
@@ -7526,7 +15038,31 @@ def process_goal(row):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def process_goal_part(row):
+
+
+
+
+
+
+
+
 
 
 
@@ -7542,7 +15078,23 @@ def process_goal_part(row):
 
 
 
+
+
+
+
+
+
+
+
     target = float(p.get('target_amount') or 0)
+
+
+
+
+
+
+
+
 
 
 
@@ -7558,7 +15110,23 @@ def process_goal_part(row):
 
 
 
+
+
+
+
+
+
+
+
     p['remaining_amount']    = max(target - saved, 0)
+
+
+
+
+
+
+
+
 
 
 
@@ -7574,6 +15142,14 @@ def process_goal_part(row):
 
 
 
+
+
+
+
+
+
+
+
     p['status_class'] = {'Completed': 'success', 'In Progress': 'primary',
 
 
@@ -7582,7 +15158,23 @@ def process_goal_part(row):
 
 
 
+
+
+
+
+
+
+
+
                          'On Hold': 'warning', 'Pending': 'secondary'}.get(p.get('status', 'Pending'), 'secondary')
+
+
+
+
+
+
+
+
 
 
 
@@ -7614,7 +15206,39 @@ def process_goal_part(row):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -7630,7 +15254,31 @@ def process_goal_part(row):
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7654,7 +15302,23 @@ def process_goal_part(row):
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -7670,7 +15334,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -7686,7 +15366,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
     category = request.args.get('category', '')
+
+
+
+
+
+
+
+
 
 
 
@@ -7702,7 +15398,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
     priority = request.args.get('priority', '')
+
+
+
+
+
+
+
+
 
 
 
@@ -7718,7 +15430,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -7734,7 +15462,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -7750,7 +15494,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
             params = [user_id]
+
+
+
+
+
+
+
+
 
 
 
@@ -7766,7 +15526,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                 sql += ' AND (goal_name LIKE %s OR description LIKE %s)'
+
+
+
+
+
+
+
+
 
 
 
@@ -7782,7 +15558,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
             if category:
+
+
+
+
+
+
+
+
 
 
 
@@ -7798,7 +15590,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                 params.append(category)
+
+
+
+
+
+
+
+
 
 
 
@@ -7814,7 +15622,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                 sql += ' AND status = %s'
+
+
+
+
+
+
+
+
 
 
 
@@ -7830,7 +15654,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
             if priority:
+
+
+
+
+
+
+
+
 
 
 
@@ -7846,7 +15686,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                 params.append(priority)
+
+
+
+
+
+
+
+
 
 
 
@@ -7862,7 +15718,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                 'newest': 'created_at DESC',
+
+
+
+
+
+
+
+
 
 
 
@@ -7878,7 +15750,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                 'deadline': 'target_date ASC',
+
+
+
+
+
+
+
+
 
 
 
@@ -7894,7 +15782,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                 'amount_low': 'target_amount ASC',
+
+
+
+
+
+
+
+
 
 
 
@@ -7910,7 +15814,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
             }
+
+
+
+
+
+
+
+
 
 
 
@@ -7926,7 +15846,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute(sql, params)
+
+
+
+
+
+
+
+
 
 
 
@@ -7942,7 +15878,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -7958,7 +15910,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -7974,7 +15942,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
         goals = []
+
+
+
+
+
+
+
+
 
 
 
@@ -7990,7 +15974,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                            goals=goals, categories=GOAL_CATEGORIES,
+
+
+
+
+
+
+
+
 
 
 
@@ -8006,7 +16006,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                            search=search, selected_category=category,
+
+
+
+
+
+
+
+
 
 
 
@@ -8022,7 +16038,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
                            selected_sort=sort,
+
+
+
+
+
+
+
+
 
 
 
@@ -8054,7 +16086,39 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -8070,7 +16134,31 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -8094,7 +16182,23 @@ def goals_list():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -8110,7 +16214,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -8126,7 +16246,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
         goal_name     = request.form.get('goal_name', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -8142,7 +16278,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
         description   = request.form.get('description', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -8158,7 +16310,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
         priority      = request.form.get('priority', 'Medium')
+
+
+
+
+
+
+
+
 
 
 
@@ -8174,7 +16342,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
         notes         = request.form.get('notes', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -8190,6 +16374,14 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
         target_date   = request.form.get('target_date', '')
 
 
@@ -8198,7 +16390,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
         try:
+
+
+
+
+
+
+
+
 
 
 
@@ -8214,7 +16422,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             current_amount = float(request.form.get('current_amount', 0))
+
+
+
+
+
+
+
+
 
 
 
@@ -8230,7 +16454,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             flash('Invalid amount values.', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -8246,7 +16486,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
         errors = []
+
+
+
+
+
+
+
+
 
 
 
@@ -8262,7 +16518,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Goal name is required.')
+
+
+
+
+
+
+
+
 
 
 
@@ -8278,7 +16550,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Target amount must be greater than zero.')
+
+
+
+
+
+
+
+
 
 
 
@@ -8294,7 +16582,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Current amount cannot be negative.')
+
+
+
+
+
+
+
+
 
 
 
@@ -8310,7 +16614,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Current amount cannot exceed target amount.')
+
+
+
+
+
+
+
+
 
 
 
@@ -8326,7 +16646,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
         td = _parse_date(target_date)
+
+
+
+
+
+
+
+
 
 
 
@@ -8342,7 +16678,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Target date must be after start date.')
+
+
+
+
+
+
+
+
 
 
 
@@ -8358,7 +16710,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             for e in errors:
+
+
+
+
+
+
+
+
 
 
 
@@ -8374,7 +16742,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             return render_template('goal_planning.html',
+
+
+
+
+
+
+
+
 
 
 
@@ -8390,7 +16774,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
                                    statuses=GOAL_STATUSES, form=request.form,
+
+
+
+
+
+
+
+
 
 
 
@@ -8406,7 +16806,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
                                    user_name=session.get('user_name', 'User'))
+
+
+
+
+
+
+
+
 
 
 
@@ -8422,7 +16838,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             status = 'Completed'
+
+
+
+
+
+
+
+
 
 
 
@@ -8438,7 +16870,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -8454,7 +16902,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('''INSERT INTO goals (user_id, goal_name, goal_type, description,
+
+
+
+
+
+
+
+
 
 
 
@@ -8470,7 +16934,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
                     priority, status, notes) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+
+
+
+
+
+
+
+
 
 
 
@@ -8486,7 +16966,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
                      current_amount, start_date or None, target_date or None,
+
+
+
+
+
+
+
+
 
 
 
@@ -8502,7 +16998,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -8518,7 +17030,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             return redirect(url_for('goals_list'))
+
+
+
+
+
+
+
+
 
 
 
@@ -8534,7 +17062,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
             flash(f'Error creating goal: {e}', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -8550,7 +17094,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
                            categories=GOAL_CATEGORIES, priorities=GOAL_PRIORITIES,
+
+
+
+
+
+
+
+
 
 
 
@@ -8566,6 +17126,14 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
                            today=datetime.now().strftime('%Y-%m-%d'),
 
 
@@ -8574,7 +17142,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
                            user_name=session.get('user_name', 'User'),
+
+
+
+
+
+
+
+
 
 
 
@@ -8606,7 +17190,39 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/goals/<int:goal_id>/edit', methods=['GET', 'POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -8622,7 +17238,23 @@ def goal_planning():
 
 
 
+
+
+
+
+
+
+
+
 def edit_goal(goal_id):
+
+
+
+
+
+
+
+
 
 
 
@@ -8638,7 +17270,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -8654,7 +17302,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -8670,7 +17334,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             row = cur.fetchone()
+
+
+
+
+
+
+
+
 
 
 
@@ -8686,7 +17366,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     except Exception:
+
+
+
+
+
+
+
+
 
 
 
@@ -8702,7 +17398,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     if not row:
+
+
+
+
+
+
+
+
 
 
 
@@ -8718,7 +17430,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         return redirect(url_for('goals_list'))
+
+
+
+
+
+
+
+
 
 
 
@@ -8734,7 +17462,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     if request.method == 'POST':
+
+
+
+
+
+
+
+
 
 
 
@@ -8750,7 +17494,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         goal_type     = request.form.get('goal_type', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -8766,7 +17526,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         category      = request.form.get('category', 'Personal')
+
+
+
+
+
+
+
+
 
 
 
@@ -8782,7 +17558,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         status        = request.form.get('status', 'Active')
+
+
+
+
+
+
+
+
 
 
 
@@ -8798,7 +17590,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         start_date    = request.form.get('start_date', '')
+
+
+
+
+
+
+
+
 
 
 
@@ -8814,7 +17622,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         try:
+
+
+
+
+
+
+
+
 
 
 
@@ -8830,7 +17654,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             current_amount = float(request.form.get('current_amount', 0))
+
+
+
+
+
+
+
+
 
 
 
@@ -8846,7 +17686,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             flash('Invalid amount values.', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -8862,7 +17718,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         errors = []
+
+
+
+
+
+
+
+
 
 
 
@@ -8878,7 +17750,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Goal name is required.')
+
+
+
+
+
+
+
+
 
 
 
@@ -8894,7 +17782,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             errors.append('Target amount must be greater than zero.')
+
+
+
+
+
+
+
+
 
 
 
@@ -8910,7 +17814,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             for e in errors:
+
+
+
+
+
+
+
+
 
 
 
@@ -8926,7 +17846,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             return render_template('goal_planning.html',
+
+
+
+
+
+
+
+
 
 
 
@@ -8942,7 +17878,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                                    statuses=GOAL_STATUSES, goal=goal, edit=True,
+
+
+
+
+
+
+
+
 
 
 
@@ -8958,7 +17910,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                                    user_name=session.get('user_name', 'User'))
+
+
+
+
+
+
+
+
 
 
 
@@ -8974,7 +17942,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             status = 'Completed'
+
+
+
+
+
+
+
+
 
 
 
@@ -8990,7 +17974,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -9006,7 +18006,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute('''UPDATE goals SET goal_name=%s, goal_type=%s, description=%s,
+
+
+
+
+
+
+
+
 
 
 
@@ -9022,7 +18038,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                     category=%s, priority=%s, status=%s, notes=%s WHERE id=%s AND user_id=%s''',
+
+
+
+
+
+
+
+
 
 
 
@@ -9038,7 +18070,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                      start_date or None, target_date or None, category, priority, status,
+
+
+
+
+
+
+
+
 
 
 
@@ -9054,7 +18102,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -9070,7 +18134,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             return redirect(url_for('goal_detail', goal_id=goal_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -9086,7 +18166,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             flash(f'Error updating goal: {e}', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -9102,7 +18198,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                            categories=GOAL_CATEGORIES, priorities=GOAL_PRIORITIES,
+
+
+
+
+
+
+
+
 
 
 
@@ -9118,7 +18230,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                            today=datetime.now().strftime('%Y-%m-%d'),
+
+
+
+
+
+
+
+
 
 
 
@@ -9150,7 +18278,39 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -9166,7 +18326,31 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -9190,7 +18374,23 @@ def edit_goal(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -9206,7 +18406,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -9222,7 +18438,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -9238,7 +18470,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT * FROM goals WHERE id = %s AND user_id = %s', (goal_id, user_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -9254,7 +18502,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             if not row:
+
+
+
+
+
+
+
+
 
 
 
@@ -9270,7 +18534,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 return redirect(url_for('goals_list'))
+
+
+
+
+
+
+
+
 
 
 
@@ -9286,7 +18566,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT * FROM goal_parts WHERE goal_id = %s ORDER BY created_at ASC', (goal_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -9302,7 +18598,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             parts = [process_goal_part(p) for p in parts_raw]
+
+
+
+
+
+
+
+
 
 
 
@@ -9318,7 +18630,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             savings = [dict(s) for s in cur.fetchall()]
+
+
+
+
+
+
+
+
 
 
 
@@ -9334,7 +18662,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 s['amount'] = float(s['amount'])
+
+
+
+
+
+
+
+
 
 
 
@@ -9350,7 +18694,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -9366,7 +18726,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         flash('Error loading goal details.', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -9382,6 +18758,14 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     return render_template('goal_details.html', goal=goal, parts=parts, savings=savings,
 
 
@@ -9390,7 +18774,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                            today=datetime.now().strftime('%Y-%m-%d'),
+
+
+
+
+
+
+
+
 
 
 
@@ -9422,7 +18822,39 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -9438,7 +18870,31 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -9462,7 +18918,23 @@ def goal_detail(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -9478,7 +18950,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -9494,7 +18982,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -9510,7 +19014,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT goal_name FROM goals WHERE id = %s AND user_id = %s', (goal_id, user_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -9526,7 +19046,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             if not row:
+
+
+
+
+
+
+
+
 
 
 
@@ -9542,7 +19078,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 return redirect(url_for('goals_list'))
+
+
+
+
+
+
+
+
 
 
 
@@ -9558,7 +19110,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('DELETE FROM goals WHERE id = %s AND user_id = %s', (goal_id, user_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -9574,7 +19142,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         flash(f'Goal "{name}" deleted.', 'info')
+
+
+
+
+
+
+
+
 
 
 
@@ -9590,7 +19174,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         flash(f'Error: {e}', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -9622,7 +19222,39 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/goals/<int:goal_id>/savings', methods=['POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -9638,7 +19270,23 @@ def goal_delete(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 def add_savings(goal_id):
+
+
+
+
+
+
+
+
 
 
 
@@ -9654,7 +19302,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     amount_str = request.form.get('amount', '0')
+
+
+
+
+
+
+
+
 
 
 
@@ -9670,6 +19334,14 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     note = request.form.get('note', '').strip()
 
 
@@ -9678,7 +19350,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -9694,7 +19382,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         if amount <= 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -9710,7 +19414,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             return redirect(url_for('goal_detail', goal_id=goal_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -9726,7 +19446,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         flash('Invalid amount.', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -9742,7 +19478,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -9758,7 +19510,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -9774,7 +19542,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             if not cur.fetchone():
+
+
+
+
+
+
+
+
 
 
 
@@ -9790,7 +19574,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -9806,7 +19606,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('INSERT INTO savings_goals (goal_id, amount, saving_date, note) VALUES (%s,%s,%s,%s)',
+
+
+
+
+
+
+
+
 
 
 
@@ -9822,7 +19638,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('UPDATE goals SET current_amount = current_amount + %s WHERE id = %s', (amount, goal_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -9838,7 +19670,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT target_amount, current_amount FROM goals WHERE id = %s', (goal_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -9854,7 +19702,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             if g and float(g['current_amount']) >= float(g['target_amount']):
+
+
+
+
+
+
+
+
 
 
 
@@ -9870,7 +19734,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -9886,7 +19766,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -9902,7 +19798,39 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     return redirect(url_for('goal_detail', goal_id=goal_id))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -9934,7 +19862,23 @@ def add_savings(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -9950,7 +19894,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -9966,7 +19926,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     due_date  = request.form.get('due_date', '') or None
+
+
+
+
+
+
+
+
 
 
 
@@ -9982,7 +19958,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -9998,7 +19990,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         saved_amount  = float(request.form.get('saved_amount', 0))
+
+
+
+
+
+
+
+
 
 
 
@@ -10014,6 +20022,14 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         flash('Invalid amount.', 'danger')
 
 
@@ -10022,7 +20038,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         return redirect(url_for('goal_detail', goal_id=goal_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -10038,7 +20070,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         flash('Milestone name is required.', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -10054,7 +20102,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -10070,7 +20134,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -10086,7 +20166,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             if not cur.fetchone():
+
+
+
+
+
+
+
+
 
 
 
@@ -10102,7 +20198,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -10118,7 +20230,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''INSERT INTO goal_parts (goal_id, part_name, target_amount, saved_amount, due_date, status)
+
+
+
+
+
+
+
+
 
 
 
@@ -10134,7 +20262,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                         (goal_id, part_name, target_amount, saved_amount, due_date, part_status))
+
+
+
+
+
+
+
+
 
 
 
@@ -10150,7 +20294,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         flash(f'Milestone "{part_name}" added! ✅', 'success')
+
+
+
+
+
+
+
+
 
 
 
@@ -10166,6 +20326,14 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         flash(f'Error: {e}', 'danger')
 
 
@@ -10174,7 +20342,39 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     return redirect(url_for('goal_detail', goal_id=goal_id))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -10206,7 +20406,23 @@ def add_milestone(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -10222,7 +20438,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -10238,7 +20470,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
     part_status  = request.form.get('part_status', 'Pending')
+
+
+
+
+
+
+
+
 
 
 
@@ -10254,7 +20502,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -10270,7 +20534,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT id FROM goals WHERE id = %s AND user_id = %s', (goal_id, user_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -10286,7 +20566,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
                 flash('Goal not found.', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -10302,7 +20598,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
                 return redirect(url_for('goals_list'))
+
+
+
+
+
+
+
+
 
 
 
@@ -10318,7 +20630,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
                         (saved_amount, part_status, part_id, goal_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -10334,7 +20662,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
         flash('Milestone updated! ✅', 'success')
+
+
+
+
+
+
+
+
 
 
 
@@ -10350,7 +20694,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
         flash(f'Error: {e}', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -10382,7 +20742,39 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -10398,7 +20790,31 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -10422,7 +20838,23 @@ def update_milestone(goal_id, part_id):
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -10438,7 +20870,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -10454,7 +20902,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         phone    = request.form.get('phone', '').strip()
+
+
+
+
+
+
+
+
 
 
 
@@ -10470,6 +20934,14 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         notes    = request.form.get('notes', '').strip()
 
 
@@ -10478,7 +20950,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         try:
+
+
+
+
+
+
+
+
 
 
 
@@ -10494,7 +20982,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             invest_cap = float(request.form.get('monthly_investment_capacity', 0) or 0)
+
+
+
+
+
+
+
+
 
 
 
@@ -10510,7 +21014,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             saving_cap = 0
+
+
+
+
+
+
+
+
 
 
 
@@ -10526,7 +21046,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         try:
+
+
+
+
+
+
+
+
 
 
 
@@ -10542,7 +21078,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -10558,7 +21110,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
                 existing = cur.fetchone()
+
+
+
+
+
+
+
+
 
 
 
@@ -10574,7 +21142,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute('''UPDATE user_profile SET phone=%s, currency=%s,
+
+
+
+
+
+
+
+
 
 
 
@@ -10590,7 +21174,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
                         notes=%s WHERE user_id=%s''',
+
+
+
+
+
+
+
+
 
 
 
@@ -10606,7 +21206,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
                 else:
+
+
+
+
+
+
+
+
 
 
 
@@ -10622,7 +21238,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
                         monthly_saving_capacity, monthly_investment_capacity, notes)
+
+
+
+
+
+
+
+
 
 
 
@@ -10638,7 +21270,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
                         (user_id, phone, currency, saving_cap, invest_cap, notes))
+
+
+
+
+
+
+
+
 
 
 
@@ -10654,7 +21302,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             flash('Profile updated successfully! ✅', 'success')
+
+
+
+
+
+
+
+
 
 
 
@@ -10670,7 +21334,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -10694,7 +21374,31 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # Get profile and stats
+
+
+
+
+
+
+
+
 
 
 
@@ -10710,7 +21414,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -10726,7 +21446,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT * FROM user_profile WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -10742,7 +21478,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             prof = dict(prof) if prof else {}
+
+
+
+
+
+
+
+
 
 
 
@@ -10758,7 +21510,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT COUNT(*) AS total FROM goals WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -10774,7 +21542,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT COUNT(*) AS cnt FROM goals WHERE user_id = %s AND status = 'Active'", (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -10790,7 +21574,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT COUNT(*) AS cnt FROM goals WHERE user_id = %s AND status = 'Completed'", (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -10806,7 +21606,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('SELECT COALESCE(SUM(current_amount), 0) AS total FROM goals WHERE user_id = %s', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -10822,7 +21638,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             # Investment stats
+
+
+
+
+
+
+
+
 
 
 
@@ -10838,7 +21670,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             total_investments = cur.fetchone()['cnt']
+
+
+
+
+
+
+
+
 
 
 
@@ -10854,7 +21702,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
             total_invested = float(cur.fetchone()['total'])
+
+
+
+
+
+
+
+
 
 
 
@@ -10870,7 +21734,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -10886,6 +21766,14 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         prof = {}
 
 
@@ -10894,7 +21782,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         total_goals = active_goals = completed_goals = total_investments = 0
+
+
+
+
+
+
+
+
 
 
 
@@ -10918,7 +21822,31 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     goal_stats = {
+
+
+
+
+
+
+
+
 
 
 
@@ -10934,6 +21862,14 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         'completed': completed_goals, 'total_saved': total_saved,
 
 
@@ -10942,7 +21878,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
     }
+
+
+
+
+
+
+
+
 
 
 
@@ -10958,7 +21910,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
         'total': total_investments, 'total_invested': total_invested,
+
+
+
+
+
+
+
+
 
 
 
@@ -10974,7 +21942,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
     return render_template('profile.html', prof=prof,
+
+
+
+
+
+
+
+
 
 
 
@@ -10990,7 +21974,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
                            user_name=session.get('user_name', 'User'),
+
+
+
+
+
+
+
+
 
 
 
@@ -11022,7 +22022,39 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/api/dashboard-goals-data')
+
+
+
+
+
+
+
+
 
 
 
@@ -11038,7 +22070,23 @@ def profile_page():
 
 
 
+
+
+
+
+
+
+
+
 def api_dashboard_goals_data():
+
+
+
+
+
+
+
+
 
 
 
@@ -11054,7 +22102,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -11070,7 +22134,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -11086,7 +22166,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT status, COUNT(*) as cnt FROM goals WHERE user_id = %s GROUP BY status", (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -11102,7 +22198,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             status_counts = {'Active': 0, 'Completed': 0, 'On Hold': 0}
+
+
+
+
+
+
+
+
 
 
 
@@ -11118,6 +22230,14 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 s = r['status']
 
 
@@ -11126,7 +22246,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 if s in status_counts:
+
+
+
+
+
+
+
+
 
 
 
@@ -11150,7 +22286,31 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Category distribution
+
+
+
+
+
+
+
+
 
 
 
@@ -11166,7 +22326,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             cat_rows = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -11190,7 +22366,31 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Target vs Saved (top 6 goals by target)
+
+
+
+
+
+
+
+
 
 
 
@@ -11206,7 +22406,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             top_goals = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -11222,7 +22438,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 'labels': [g['goal_name'] for g in top_goals],
+
+
+
+
+
+
+
+
 
 
 
@@ -11238,7 +22470,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 'saved':  [float(g['current_amount']) for g in top_goals],
+
+
+
+
+
+
+
+
 
 
 
@@ -11262,7 +22510,31 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Monthly savings trend (last 6 months)
+
+
+
+
+
+
+
+
 
 
 
@@ -11278,7 +22550,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             from decimal import Decimal
+
+
+
+
+
+
+
+
 
 
 
@@ -11294,7 +22582,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             monthly_trend = []
+
+
+
+
+
+
+
+
 
 
 
@@ -11310,7 +22614,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 # Calculate start and end date for each of the last 6 months
+
+
+
+
+
+
+
+
 
 
 
@@ -11326,7 +22646,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 m_end = today - timedelta(days=i * 30)
+
+
+
+
+
+
+
+
 
 
 
@@ -11342,7 +22678,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 # Query savings_goals for this range
+
+
+
+
+
+
+
+
 
 
 
@@ -11358,7 +22710,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                     "SELECT COALESCE(SUM(amount), 0) as total FROM savings_goals sg "
+
+
+
+
+
+
+
+
 
 
 
@@ -11374,7 +22742,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                     "WHERE g.user_id = %s AND sg.saving_date >= %s AND sg.saving_date <= %s",
+
+
+
+
+
+
+
+
 
 
 
@@ -11390,6 +22774,14 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 )
 
 
@@ -11398,7 +22790,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 row = cur.fetchone()
+
+
+
+
+
+
+
+
 
 
 
@@ -11422,7 +22830,31 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Recent goals (top 5)
+
+
+
+
+
+
+
+
 
 
 
@@ -11438,7 +22870,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             recent_rows = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -11454,7 +22902,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             recent_goals_clean = []
+
+
+
+
+
+
+
+
 
 
 
@@ -11470,7 +22934,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                 g_clean = {}
+
+
+
+
+
+
+
+
 
 
 
@@ -11486,7 +22966,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                     if isinstance(v, (date, datetime)):
+
+
+
+
+
+
+
+
 
 
 
@@ -11502,7 +22998,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                     elif isinstance(v, Decimal):
+
+
+
+
+
+
+
+
 
 
 
@@ -11518,6 +23030,14 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                     else:
 
 
@@ -11526,7 +23046,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
                         g_clean[k] = v
+
+
+
+
+
+
+
+
 
 
 
@@ -11550,7 +23086,31 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -11566,7 +23126,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             'status_distribution': status_counts,
+
+
+
+
+
+
+
+
 
 
 
@@ -11582,7 +23158,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             'target_vs_saved': target_vs_saved,
+
+
+
+
+
+
+
+
 
 
 
@@ -11598,7 +23190,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
             'recent_goals': recent_goals_clean
+
+
+
+
+
+
+
+
 
 
 
@@ -11614,7 +23222,23 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -11654,7 +23278,47 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -11670,7 +23334,31 @@ def api_dashboard_goals_data():
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -11694,7 +23382,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
     """Generate smart financial alerts for the user (rule-based AI analysis)."""
+
+
+
+
+
+
+
+
 
 
 
@@ -11710,7 +23414,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -11726,7 +23446,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
             cur_month = today.month
+
+
+
+
+
+
+
+
 
 
 
@@ -11750,7 +23486,31 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # ── 1. Budget exceeded / warning alerts ──────────────────
+
+
+
+
+
+
+
+
 
 
 
@@ -11766,7 +23526,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 SELECT b.id, b.category, b.limit_amount, b.goal_id,
+
+
+
+
+
+
+
+
 
 
 
@@ -11782,7 +23558,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 FROM budget b
+
+
+
+
+
+
+
+
 
 
 
@@ -11798,7 +23590,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                   ON e.user_id = b.user_id
+
+
+
+
+
+
+
+
 
 
 
@@ -11814,7 +23622,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                   AND MONTH(e.expense_date) = b.month
+
+
+
+
+
+
+
+
 
 
 
@@ -11830,7 +23654,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 WHERE b.user_id = %s AND b.month = %s AND b.year = %s
+
+
+
+
+
+
+
+
 
 
 
@@ -11846,7 +23686,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
             ''', (user_id, cur_month, cur_year))
+
+
+
+
+
+
+
+
 
 
 
@@ -11870,7 +23726,31 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             for bud in budgets:
+
+
+
+
+
+
+
+
 
 
 
@@ -11886,7 +23766,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 limit_amt  = float(bud['limit_amount'])
+
+
+
+
+
+
+
+
 
 
 
@@ -11902,7 +23798,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 ref        = f"budget:{bud['id']}"
+
+
+
+
+
+
+
+
 
 
 
@@ -11926,7 +23838,31 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 if pct >= 100:
+
+
+
+
+
+
+
+
 
 
 
@@ -11942,7 +23878,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -11958,7 +23910,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         (user_id, ref, cur_month, cur_year)
+
+
+
+
+
+
+
+
 
 
 
@@ -11974,7 +23942,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     if not cur.fetchone():
+
+
+
+
+
+
+
+
 
 
 
@@ -11990,7 +23974,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                             "INSERT INTO alerts (user_id, alert_type, title, message, severity, trigger_ref) VALUES (%s,%s,%s,%s,%s,%s)",
+
+
+
+
+
+
+
+
 
 
 
@@ -12006,7 +24006,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                              f'🔴 Budget Exceeded: {cat}',
+
+
+
+
+
+
+
+
 
 
 
@@ -12022,6 +24038,14 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                              'danger', ref)
 
 
@@ -12030,7 +24054,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         )
+
+
+
+
+
+
+
+
 
 
 
@@ -12046,7 +24086,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -12062,7 +24118,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         (user_id, ref, cur_month, cur_year)
+
+
+
+
+
+
+
+
 
 
 
@@ -12078,7 +24150,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     if not cur.fetchone():
+
+
+
+
+
+
+
+
 
 
 
@@ -12094,7 +24182,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                             "INSERT INTO alerts (user_id, alert_type, title, message, severity, trigger_ref) VALUES (%s,%s,%s,%s,%s,%s)",
+
+
+
+
+
+
+
+
 
 
 
@@ -12110,7 +24214,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                              f'🟡 Budget Warning: {cat}',
+
+
+
+
+
+
+
+
 
 
 
@@ -12126,6 +24246,14 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                              'warning', ref)
 
 
@@ -12134,7 +24262,31 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -12158,7 +24310,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -12174,7 +24342,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 (user_id,)
+
+
+
+
+
+
+
+
 
 
 
@@ -12190,7 +24374,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
             goals = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -12206,6 +24406,14 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 if not g['target_date']:
 
 
@@ -12214,7 +24422,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     continue
+
+
+
+
+
+
+
+
 
 
 
@@ -12230,7 +24454,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 if not td:
+
+
+
+
+
+
+
+
 
 
 
@@ -12246,6 +24486,14 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 days_left = (td - today).days
 
 
@@ -12254,7 +24502,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 ref = f"goal:{g['id']}"
+
+
+
+
+
+
+
+
 
 
 
@@ -12278,6 +24542,22 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 if 0 < days_left <= 7:
 
 
@@ -12286,7 +24566,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -12302,7 +24598,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         (user_id, ref, cur_month, cur_year)
+
+
+
+
+
+
+
+
 
 
 
@@ -12318,7 +24630,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     if not cur.fetchone():
+
+
+
+
+
+
+
+
 
 
 
@@ -12334,7 +24662,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                             "INSERT INTO alerts (user_id, alert_type, title, message, severity, trigger_ref) VALUES (%s,%s,%s,%s,%s,%s)",
+
+
+
+
+
+
+
+
 
 
 
@@ -12350,7 +24694,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                              f'🔴 Goal Deadline in {days_left} day(s): {g["goal_name"]}',
+
+
+
+
+
+
+
+
 
 
 
@@ -12366,6 +24726,14 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                              'danger', ref)
 
 
@@ -12374,7 +24742,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         )
+
+
+
+
+
+
+
+
 
 
 
@@ -12390,7 +24774,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -12406,7 +24806,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         (user_id, ref, cur_month, cur_year)
+
+
+
+
+
+
+
+
 
 
 
@@ -12422,7 +24838,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     if not cur.fetchone():
+
+
+
+
+
+
+
+
 
 
 
@@ -12438,7 +24870,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                             "INSERT INTO alerts (user_id, alert_type, title, message, severity, trigger_ref) VALUES (%s,%s,%s,%s,%s,%s)",
+
+
+
+
+
+
+
+
 
 
 
@@ -12454,7 +24902,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                              f'🟡 Goal Deadline in {days_left} days: {g["goal_name"]}',
+
+
+
+
+
+
+
+
 
 
 
@@ -12470,6 +24934,14 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                              'warning', ref)
 
 
@@ -12478,7 +24950,31 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -12502,7 +24998,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -12518,6 +25030,14 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 (user_id, (today - timedelta(days=7)).strftime('%Y-%m-%d'))
 
 
@@ -12526,7 +25046,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
             )
+
+
+
+
+
+
+
+
 
 
 
@@ -12542,7 +25078,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -12558,7 +25110,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 (user_id, (today - timedelta(days=14)).strftime('%Y-%m-%d'), (today - timedelta(days=7)).strftime('%Y-%m-%d'))
+
+
+
+
+
+
+
+
 
 
 
@@ -12574,7 +25142,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
             last_week = float(cur.fetchone()['total'])
+
+
+
+
+
+
+
+
 
 
 
@@ -12590,7 +25174,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 spike_pct = round((this_week - last_week) / last_week * 100)
+
+
+
+
+
+
+
+
 
 
 
@@ -12606,7 +25206,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     "SELECT id FROM alerts WHERE user_id=%s AND alert_type='weekly_spike' AND created_at >= %s",
+
+
+
+
+
+
+
+
 
 
 
@@ -12622,7 +25238,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                 )
+
+
+
+
+
+
+
+
 
 
 
@@ -12638,7 +25270,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     cur.execute(
+
+
+
+
+
+
+
+
 
 
 
@@ -12654,7 +25302,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                         (user_id, 'weekly_spike',
+
+
+
+
+
+
+
+
 
 
 
@@ -12670,7 +25334,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                          f'This week you spent ₹{this_week:,.0f} — {spike_pct}% more than last week (₹{last_week:,.0f}). Consider reviewing your expenses.',
+
+
+
+
+
+
+
+
 
 
 
@@ -12686,6 +25366,14 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
                     )
 
 
@@ -12694,7 +25382,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -12726,7 +25430,39 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/api/alerts/generate', methods=['POST'])
+
+
+
+
+
+
+
+
 
 
 
@@ -12742,7 +25478,23 @@ def generate_alerts_for_user(user_id, conn):
 
 
 
+
+
+
+
+
+
+
+
 def api_generate_alerts():
+
+
+
+
+
+
+
+
 
 
 
@@ -12758,7 +25510,23 @@ def api_generate_alerts():
 
 
 
+
+
+
+
+
+
+
+
     user_id = session.get('user_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -12774,7 +25542,23 @@ def api_generate_alerts():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
+
+
+
+
+
+
+
+
 
 
 
@@ -12790,7 +25574,23 @@ def api_generate_alerts():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -12806,6 +25606,14 @@ def api_generate_alerts():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
 
 
@@ -12814,7 +25622,39 @@ def api_generate_alerts():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -12846,7 +25686,23 @@ def api_generate_alerts():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -12862,7 +25718,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
     """Get all alerts for current user (newest first)."""
+
+
+
+
+
+
+
+
 
 
 
@@ -12878,7 +25750,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -12894,7 +25782,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -12910,7 +25814,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
                 "SELECT id, alert_type, title, message, is_read, severity, trigger_ref, created_at FROM alerts WHERE user_id=%s ORDER BY created_at DESC LIMIT 30",
+
+
+
+
+
+
+
+
 
 
 
@@ -12926,7 +25846,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
             )
+
+
+
+
+
+
+
+
 
 
 
@@ -12942,7 +25878,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
             unread_count_res = [r for r in rows if not r['is_read']]
+
+
+
+
+
+
+
+
 
 
 
@@ -12958,7 +25910,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
         result = []
+
+
+
+
+
+
+
+
 
 
 
@@ -12974,7 +25942,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
             result.append({
+
+
+
+
+
+
+
+
 
 
 
@@ -12990,7 +25974,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
                 'alert_type': r['alert_type'],
+
+
+
+
+
+
+
+
 
 
 
@@ -13006,7 +26006,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
                 'message': r['message'],
+
+
+
+
+
+
+
+
 
 
 
@@ -13022,7 +26038,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
                 'severity': r['severity'],
+
+
+
+
+
+
+
+
 
 
 
@@ -13038,7 +26070,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
                 'created_at': str(r['created_at'])
+
+
+
+
+
+
+
+
 
 
 
@@ -13054,7 +26102,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify({'alerts': result, 'unread_count': len(unread_count_res)})
+
+
+
+
+
+
+
+
 
 
 
@@ -13070,7 +26134,39 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -13102,7 +26198,23 @@ def api_get_alerts():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -13118,7 +26230,23 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
     """Mark all alerts as read for the current user."""
+
+
+
+
+
+
+
+
 
 
 
@@ -13134,7 +26262,23 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -13150,7 +26294,23 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -13166,7 +26326,23 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
             alert_id = data.get('alert_id')
+
+
+
+
+
+
+
+
 
 
 
@@ -13182,7 +26358,23 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute("UPDATE alerts SET is_read=1 WHERE id=%s AND user_id=%s", (alert_id, user_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -13198,7 +26390,23 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute("UPDATE alerts SET is_read=1 WHERE user_id=%s", (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -13214,7 +26422,23 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify({'status': 'ok'})
+
+
+
+
+
+
+
+
 
 
 
@@ -13230,7 +26454,31 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -13254,7 +26502,23 @@ def api_mark_alerts_read():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -13270,7 +26534,23 @@ def api_clear_alerts():
 
 
 
+
+
+
+
+
+
+
+
     """Delete all alerts for the current user."""
+
+
+
+
+
+
+
+
 
 
 
@@ -13286,7 +26566,23 @@ def api_clear_alerts():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -13302,7 +26598,23 @@ def api_clear_alerts():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -13318,7 +26630,23 @@ def api_clear_alerts():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -13334,7 +26662,23 @@ def api_clear_alerts():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -13366,7 +26710,39 @@ def api_clear_alerts():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -13382,7 +26758,31 @@ def api_clear_alerts():
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -13406,7 +26806,23 @@ def api_clear_alerts():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -13422,7 +26838,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
     """Rule-based AI spending pattern analysis."""
+
+
+
+
+
+
+
+
 
 
 
@@ -13438,7 +26870,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -13454,7 +26902,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -13470,7 +26934,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute('''
+
+
+
+
+
+
+
+
 
 
 
@@ -13486,7 +26966,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 FROM expenses WHERE user_id=%s
+
+
+
+
+
+
+
+
 
 
 
@@ -13502,6 +26998,14 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 GROUP BY category ORDER BY total DESC LIMIT 1
 
 
@@ -13510,7 +27014,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             ''', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -13534,7 +27054,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Month over month comparison (last 3 months)
+
+
+
+
+
+
+
+
 
 
 
@@ -13550,7 +27094,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 SELECT MONTHNAME(expense_date) AS month_name,
+
+
+
+
+
+
+
+
 
 
 
@@ -13566,7 +27126,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                        YEAR(expense_date) AS y,
+
+
+
+
+
+
+
+
 
 
 
@@ -13582,7 +27158,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 FROM expenses WHERE user_id=%s
+
+
+
+
+
+
+
+
 
 
 
@@ -13598,6 +27190,14 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 GROUP BY y, m, month_name ORDER BY y ASC, m ASC
 
 
@@ -13606,7 +27206,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             ''', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -13630,7 +27246,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Savings rate
+
+
+
+
+
+
+
+
 
 
 
@@ -13646,6 +27286,14 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             cur_income = float(cur.fetchone()['t'])
 
 
@@ -13654,7 +27302,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT COALESCE(SUM(amount),0) AS t FROM expenses WHERE user_id=%s AND MONTH(expense_date)=MONTH(CURDATE()) AND YEAR(expense_date)=YEAR(CURDATE())", (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -13678,7 +27342,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Over-budget categories
+
+
+
+
+
+
+
+
 
 
 
@@ -13694,7 +27382,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 SELECT b.category, b.limit_amount, COALESCE(SUM(e.amount),0) AS spent
+
+
+
+
+
+
+
+
 
 
 
@@ -13710,7 +27414,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 LEFT JOIN expenses e ON e.user_id=b.user_id AND e.category=b.category
+
+
+
+
+
+
+
+
 
 
 
@@ -13726,7 +27446,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 WHERE b.user_id=%s AND b.month=MONTH(CURDATE()) AND b.year=YEAR(CURDATE())
+
+
+
+
+
+
+
+
 
 
 
@@ -13742,7 +27478,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             ''', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -13766,7 +27518,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Biggest single expense this month
+
+
+
+
+
+
+
+
 
 
 
@@ -13782,7 +27558,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 SELECT category, amount, expense_date FROM expenses
+
+
+
+
+
+
+
+
 
 
 
@@ -13798,7 +27590,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 ORDER BY amount DESC LIMIT 1
+
+
+
+
+
+
+
+
 
 
 
@@ -13814,6 +27622,14 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             biggest = cur.fetchone()
 
 
@@ -13822,7 +27638,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -13846,7 +27686,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
         # Savings rate insight
+
+
+
+
+
+
+
+
 
 
 
@@ -13862,7 +27718,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
         if savings_rate >= 30:
+
+
+
+
+
+
+
+
 
 
 
@@ -13878,7 +27750,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
         elif savings_rate >= 15:
+
+
+
+
+
+
+
+
 
 
 
@@ -13894,7 +27782,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
         elif cur_income > 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -13918,6 +27822,22 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # Top category insight
 
 
@@ -13926,7 +27846,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
         if top_cat:
+
+
+
+
+
+
+
+
 
 
 
@@ -13950,7 +27886,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # Over-budget insight
+
+
+
+
+
+
+
+
 
 
 
@@ -13966,7 +27926,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             cats = ', '.join([r['category'] for r in over_budget])
+
+
+
+
+
+
+
+
 
 
 
@@ -13990,7 +27966,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # Spending trend
+
+
+
+
+
+
+
+
 
 
 
@@ -14006,7 +28006,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             prev_total = float(monthly_exp[-2]['total'])
+
+
+
+
+
+
+
+
 
 
 
@@ -14022,7 +28038,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
             if prev_total > 0:
+
+
+
+
+
+
+
+
 
 
 
@@ -14038,7 +28070,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 if trend_pct > 20:
+
+
+
+
+
+
+
+
 
 
 
@@ -14054,7 +28102,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
                 elif trend_pct < -10:
+
+
+
+
+
+
+
+
 
 
 
@@ -14078,6 +28142,22 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # Biggest expense
 
 
@@ -14086,7 +28166,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
         if biggest:
+
+
+
+
+
+
+
+
 
 
 
@@ -14110,7 +28206,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         if not insights:
+
+
+
+
+
+
+
+
 
 
 
@@ -14134,6 +28254,22 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         return jsonify({'insights': insights, 'savings_rate': savings_rate, 'monthly_data': [{'month': r['month_name'], 'total': float(r['total'])} for r in monthly_exp]})
 
 
@@ -14142,7 +28278,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -14174,7 +28326,39 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -14190,7 +28374,31 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -14214,7 +28422,23 @@ def api_spending_analysis():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -14230,7 +28454,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
     """Return budgets with linked goal name and current spent amount."""
+
+
+
+
+
+
+
+
 
 
 
@@ -14246,7 +28486,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -14262,7 +28518,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -14278,7 +28550,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 SELECT b.id, b.category, b.limit_amount, b.month, b.year, b.goal_id,
+
+
+
+
+
+
+
+
 
 
 
@@ -14294,7 +28582,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                        COALESCE(SUM(e.amount),0) AS spent
+
+
+
+
+
+
+
+
 
 
 
@@ -14310,7 +28614,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 LEFT JOIN goals g ON b.goal_id = g.id
+
+
+
+
+
+
+
+
 
 
 
@@ -14326,7 +28646,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                   AND MONTH(e.expense_date)=b.month AND YEAR(e.expense_date)=b.year
+
+
+
+
+
+
+
+
 
 
 
@@ -14342,7 +28678,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 GROUP BY b.id
+
+
+
+
+
+
+
+
 
 
 
@@ -14358,7 +28710,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
             ''', (user_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -14374,7 +28742,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -14390,7 +28774,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
         for r in rows:
+
+
+
+
+
+
+
+
 
 
 
@@ -14406,7 +28806,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
             spent     = float(r['spent'])
+
+
+
+
+
+
+
+
 
 
 
@@ -14422,7 +28838,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
             result.append({
+
+
+
+
+
+
+
+
 
 
 
@@ -14438,7 +28870,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 'category':    r['category'],
+
+
+
+
+
+
+
+
 
 
 
@@ -14454,7 +28902,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 'month':       r['month'],
+
+
+
+
+
+
+
+
 
 
 
@@ -14470,7 +28934,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 'goal_id':     r['goal_id'],
+
+
+
+
+
+
+
+
 
 
 
@@ -14486,7 +28966,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 'goal_saved':  float(r['goal_saved']) if r['goal_saved'] else 0,
+
+
+
+
+
+
+
+
 
 
 
@@ -14502,7 +28998,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 'spent':       spent,
+
+
+
+
+
+
+
+
 
 
 
@@ -14518,7 +29030,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
                 'status':      'exceeded' if pct >= 100 else ('warning' if pct >= 80 else 'ok')
+
+
+
+
+
+
+
+
 
 
 
@@ -14534,7 +29062,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify(result)
+
+
+
+
+
+
+
+
 
 
 
@@ -14550,7 +29094,39 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -14582,7 +29158,23 @@ def api_budget_with_goals():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -14598,7 +29190,23 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
     """Link a budget to a goal."""
+
+
+
+
+
+
+
+
 
 
 
@@ -14614,7 +29222,23 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
     data    = request.get_json() or {}
+
+
+
+
+
+
+
+
 
 
 
@@ -14630,7 +29254,23 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -14646,7 +29286,23 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -14662,7 +29318,23 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -14678,7 +29350,23 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -14710,7 +29398,39 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -14726,7 +29446,31 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -14750,7 +29494,23 @@ def api_link_budget_goal(budget_id):
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -14766,7 +29526,23 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
     """Return last 6 months income, expenses and budget limit for trend chart."""
+
+
+
+
+
+
+
+
 
 
 
@@ -14782,7 +29558,23 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -14798,6 +29590,14 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
         conn = get_db_connection()
 
 
@@ -14806,7 +29606,23 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
         today = datetime.now().date()
+
+
+
+
+
+
+
+
 
 
 
@@ -14830,7 +29646,31 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -14846,7 +29686,23 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
                 # Compute target month/year
+
+
+
+
+
+
+
+
 
 
 
@@ -14862,7 +29718,23 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
                 m, y = target.month, target.year
+
+
+
+
+
+
+
+
 
 
 
@@ -14886,7 +29758,31 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 cur.execute("SELECT COALESCE(SUM(amount),0) AS t FROM income WHERE user_id=%s AND MONTH(income_date)=%s AND YEAR(income_date)=%s", (user_id, m, y))
+
+
+
+
+
+
+
+
 
 
 
@@ -14910,7 +29806,31 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 cur.execute("SELECT COALESCE(SUM(amount),0) AS t FROM expenses WHERE user_id=%s AND MONTH(expense_date)=%s AND YEAR(expense_date)=%s", (user_id, m, y))
+
+
+
+
+
+
+
+
 
 
 
@@ -14934,7 +29854,31 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 cur.execute("SELECT COALESCE(SUM(limit_amount),0) AS t FROM budget WHERE user_id=%s AND month=%s AND year=%s", (user_id, m, y))
+
+
+
+
+
+
+
+
 
 
 
@@ -14958,7 +29902,31 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
 
 
 
@@ -14974,7 +29942,23 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -15006,7 +29990,39 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -15022,7 +30038,31 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -15046,7 +30086,23 @@ def api_monthly_trend():
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -15062,7 +30118,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     """Return expense + savings activities for a goal (via linked budgets)."""
+
+
+
+
+
+
+
+
 
 
 
@@ -15078,7 +30150,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -15094,7 +30182,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -15110,7 +30214,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             cur.execute("SELECT goal_name FROM goals WHERE id=%s AND user_id=%s", (goal_id, user_id))
+
+
+
+
+
+
+
+
 
 
 
@@ -15126,7 +30246,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             if not goal_row:
+
+
+
+
+
+
+
+
 
 
 
@@ -15150,7 +30286,31 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Savings activities
+
+
+
+
+
+
+
+
 
 
 
@@ -15166,7 +30326,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 SELECT 'savings' AS type, amount, saving_date AS activity_date, note AS notes
+
+
+
+
+
+
+
+
 
 
 
@@ -15182,7 +30358,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             """, (goal_id,))
+
+
+
+
+
+
+
+
 
 
 
@@ -15206,7 +30398,31 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Expenses from linked budget categories
+
+
+
+
+
+
+
+
 
 
 
@@ -15222,7 +30438,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             linked_cats = [r['category'] for r in cur.fetchall()]
+
+
+
+
+
+
+
+
 
 
 
@@ -15238,7 +30470,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
             if linked_cats:
+
+
+
+
+
+
+
+
 
 
 
@@ -15254,7 +30502,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 cur.execute(f"""
+
+
+
+
+
+
+
+
 
 
 
@@ -15270,7 +30534,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                     FROM expenses WHERE user_id=%s AND category IN ({placeholders})
+
+
+
+
+
+
+
+
 
 
 
@@ -15286,7 +30566,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
                 """, [user_id] + linked_cats)
+
+
+
+
+
+
+
+
 
 
 
@@ -15310,7 +30606,39 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         conn.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -15334,7 +30662,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         for r in savings_acts:
+
+
+
+
+
+
+
+
 
 
 
@@ -15350,7 +30694,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
         for r in expense_acts:
+
+
+
+
+
+
+
+
 
 
 
@@ -15374,7 +30734,31 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         activities.sort(key=lambda x: x['date'], reverse=True)
+
+
+
+
+
+
+
+
 
 
 
@@ -15390,7 +30774,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
     except Exception as e:
+
+
+
+
+
+
+
+
 
 
 
@@ -15422,7 +30822,39 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
 
 
 
@@ -15438,7 +30870,31 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 # ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -15462,7 +30918,23 @@ def api_goal_activity(goal_id):
 
 
 
+
+
+
+
+
+
+
+
 @login_required
+
+
+
+
+
+
+
+
 
 
 
@@ -15478,7 +30950,23 @@ def api_active_goals_list():
 
 
 
+
+
+
+
+
+
+
+
     """Return list of active goals for linking to budget."""
+
+
+
+
+
+
+
+
 
 
 
@@ -15494,7 +30982,23 @@ def api_active_goals_list():
 
 
 
+
+
+
+
+
+
+
+
     try:
+
+
+
+
+
+
+
+
 
 
 
@@ -15510,7 +31014,23 @@ def api_active_goals_list():
 
 
 
+
+
+
+
+
+
+
+
         with conn.cursor() as cur:
+
+
+
+
+
+
+
+
 
 
 
@@ -15526,7 +31046,23 @@ def api_active_goals_list():
 
 
 
+
+
+
+
+
+
+
+
             rows = cur.fetchall()
+
+
+
+
+
+
+
+
 
 
 
@@ -15542,7 +31078,23 @@ def api_active_goals_list():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify([{'id': r['id'], 'goal_name': r['goal_name'], 'category': r['category']} for r in rows])
+
+
+
+
+
+
+
+
 
 
 
@@ -15558,7 +31110,39 @@ def api_active_goals_list():
 
 
 
+
+
+
+
+
+
+
+
         return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -15590,6 +31174,14 @@ def api_active_goals_list():
 
 
 
+
+
+
+
+
+
+
+
 # Handles 404 error
 
 
@@ -15598,7 +31190,23 @@ def api_active_goals_list():
 
 
 
+
+
+
+
+
+
+
+
 def not_found(e):
+
+
+
+
+
+
+
+
 
 
 
@@ -15622,7 +31230,31 @@ def not_found(e):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.errorhandler(500)
+
+
+
+
+
+
+
+
 
 
 
@@ -15638,6 +31270,14 @@ def not_found(e):
 
 
 
+
+
+
+
+
+
+
+
 def server_error(e):
 
 
@@ -15646,7 +31286,23 @@ def server_error(e):
 
 
 
+
+
+
+
+
+
+
+
     flash('An internal server error occurred.', 'danger')
+
+
+
+
+
+
+
+
 
 
 
@@ -15670,13 +31326,43 @@ def server_error(e):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
+
+
 
     import os
 
+
+
     port = int(os.environ.get('PORT', 5000))
 
+
+
     app.run(debug=True, host='0.0.0.0', port=port)
+
+
+
+
+
+
+
+
 
 
 
