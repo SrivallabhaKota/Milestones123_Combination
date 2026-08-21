@@ -66,7 +66,12 @@ def init_db():
     ssl_config = {}
     host = app.config.get('MYSQL_HOST', '')
     if app.config.get('MYSQL_SSL') or 'tidbcloud.com' in host:
-        ssl_config = {'ssl': {}}
+        ssl_config = {
+            'ssl': {
+                'check_hostname': True,
+                'verify_identity': True
+            }
+        }
 
         
 
@@ -426,7 +431,12 @@ def get_db_connection():
     ssl_config = {}
     host = app.config.get('MYSQL_HOST', '')
     if app.config.get('MYSQL_SSL') or 'tidbcloud.com' in host:
-        ssl_config = {'ssl': {}}
+        ssl_config = {
+            'ssl': {
+                'check_hostname': True,
+                'verify_identity': True
+            }
+        }
     return pymysql.connect(
         host=app.config['MYSQL_HOST'],
         port=int(app.config['MYSQL_PORT']),
