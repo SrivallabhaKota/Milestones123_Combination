@@ -34,7 +34,7 @@
 <section class="home-hero" aria-labelledby="hero-heading">
   <div class="home-container">
     <h1 class="hero-title" id="hero-heading">
-      Manage Your Money Smarter
+      Manage Your Money <span>Smarter</span>
     </h1>
     <p class="hero-subtitle">
       Track income, control expenses, create budgets,<br>
@@ -45,13 +45,13 @@
          id="hero-get-started-btn"
          class="hero-btn-primary"
          aria-label="Get started with FinSight">
-        Get Started
+        <i class="bi bi-rocket-takeoff me-2"></i>Get Started
       </a>
       <a href="{{ url_for('login_page') }}"
          id="hero-login-btn"
          class="hero-btn-outline"
          aria-label="Login to FinSight">
-        Login
+        <i class="bi bi-box-arrow-in-right me-2"></i>Login
       </a>
     </div>
   </div>
@@ -59,30 +59,46 @@
 
 <section class="home-features" aria-labelledby="features-heading">
   <div class="home-container">
-    <h2 class="home-section-title" id="features-heading">Why Choose Us?</h2>
+    <h2 class="home-section-title" id="features-heading">Why Choose <span class="text-gradient">FinSight</span>?</h2>
     <div class="home-features-grid" role="list">
 
       <article class="home-feature-card" role="listitem" id="feature-income">
-        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-wallet2"></i></span>
-        <h3 class="home-feature-title">Track Income &amp; Expenses</h3>
+        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-cash-coin"></i></span>
+        <h3 class="home-feature-title">Track Income & Expenses</h3>
         <p class="home-feature-desc">
-          Keep track of your income and expenses in one place.
-        </p>
-      </article>
-
-      <article class="home-feature-card" role="listitem" id="feature-expenses">
-        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-graph-up"></i></span>
-        <h3 class="home-feature-title">Manage Expenses</h3>
-        <p class="home-feature-desc">
-          Monitor your spending and stay within your monthly budget.
+          Record every rupee earned and spent. Get a complete financial picture at a glance.
         </p>
       </article>
 
       <article class="home-feature-card" role="listitem" id="feature-budgets">
-        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-bullseye"></i></span>
-        <h3 class="home-feature-title">Create Budgets</h3>
+        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-pie-chart-fill"></i></span>
+        <h3 class="home-feature-title">Smart Budgets</h3>
         <p class="home-feature-desc">
-          Set monthly budgets and manage your finances effectively.
+          Set monthly category budgets with real-time alerts when you're close to limits.
+        </p>
+      </article>
+
+      <article class="home-feature-card" role="listitem" id="feature-goals">
+        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-flag-fill"></i></span>
+        <h3 class="home-feature-title">Goal Planning</h3>
+        <p class="home-feature-desc">
+          Plan savings goals with deadlines, track progress, and stay motivated with smart timelines.
+        </p>
+      </article>
+
+      <article class="home-feature-card" role="listitem" id="feature-investments">
+        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-graph-up-arrow"></i></span>
+        <h3 class="home-feature-title">Investment Tracker</h3>
+        <p class="home-feature-desc">
+          Monitor your portfolio across Stocks, Mutual Funds, FDs, and more in one dashboard.
+        </p>
+      </article>
+
+      <article class="home-feature-card" role="listitem" id="feature-alerts">
+        <span class="home-feature-icon" aria-hidden="true"><i class="bi bi-bell-fill"></i></span>
+        <h3 class="home-feature-title">Smart Alerts</h3>
+        <p class="home-feature-desc">
+          Get AI-powered financial alerts for budget overruns, goal deadlines, and spending spikes.
         </p>
       </article>
 

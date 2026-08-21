@@ -4,6 +4,17 @@
  * Theme color is set via body class (theme-dash, theme-income, etc.)
  */
 (function () {
+  // Restore sidebar state immediately to prevent layout shifts
+  const savedState = localStorage.getItem('sidebarState');
+  const sidebarEl = document.getElementById('sidebar');
+  if (savedState === 'open') {
+    document.body.classList.add('sidebar-open');
+    if (sidebarEl) sidebarEl.classList.add('open');
+  } else {
+    document.body.classList.remove('sidebar-open');
+    if (sidebarEl) sidebarEl.classList.remove('open');
+  }
+
   const dot  = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
   if (!dot || !ring) return;
@@ -102,17 +113,22 @@
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebar-toggle-btn');
     if (toggleBtn && sidebar) {
+      // Restore sidebar state from localStorage
+      const savedState = localStorage.getItem('sidebarState');
+      if (savedState === 'open') {
+        sidebar.classList.add('open');
+        document.body.classList.add('sidebar-open');
+      } else {
+        sidebar.classList.remove('open');
+        document.body.classList.remove('sidebar-open');
+      }
+
       toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        sidebar.classList.toggle('open');
+        const isOpen = sidebar.classList.toggle('open');
         document.body.classList.toggle('sidebar-open');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
-          sidebar.classList.remove('open');
-          document.body.classList.remove('sidebar-open');
-        }
+        // Persist state
+        localStorage.setItem('sidebarState', isOpen ? 'open' : 'closed');
       });
     }
   }

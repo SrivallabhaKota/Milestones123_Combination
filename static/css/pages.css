@@ -44,22 +44,36 @@
 }
 
 .income-hero {
-  background: linear-gradient(135deg, #064E3B 0%, #065F46 50%, #047857 100%);
+background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+box-shadow: 0 10px 20px rgba(71, 85, 105, 0.15);
 }
 .expense-hero {
-  background: linear-gradient(135deg, #7C2D12 0%, #9A3412 50%, #C2410C 100%);
+background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+box-shadow: 0 10px 20px rgba(71, 85, 105, 0.15);
 }
 .budget-hero {
-  background: linear-gradient(135deg, #4C1D95 0%, #5B21B6 50%, #6D28D9 100%);
+background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+box-shadow: 0 10px 20px rgba(71, 85, 105, 0.15);
 }
 .invest-hero {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%);
+background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+box-shadow: 0 10px 20px rgba(71, 85, 105, 0.15);
+}
+.goals-hero {
+background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+box-shadow: 0 10px 20px rgba(71, 85, 105, 0.15);
+}
+.goal-planning-hero {
+background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+box-shadow: 0 10px 20px rgba(71, 85, 105, 0.15);
+}
+.profile-hero {
+  background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+  box-shadow: 0 10px 20px rgba(71, 85, 105, 0.15);
 }
 .dash-hero {
-  background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
-  margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 18px rgba(30, 27, 75, 0.25);
+background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+box-shadow: 0 10px 20px rgba(71, 85, 105, 0.15);
 }
 
 .page-hero::before {
