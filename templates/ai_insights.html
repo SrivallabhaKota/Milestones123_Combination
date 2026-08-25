@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Insights – FinSight</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cursor.css') }}">
+  <style>
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .insight-card {
+      background: var(--white);
+      border-radius: var(--border-radius-card);
+      border: 1px solid #E2E8F0;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .insight-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    }
+    .insight-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .insight-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    .insight-text {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .wisher-card {
+      background: var(--white);
+      border-radius: var(--border-radius-card);
+      border: 1px solid #E2E8F0;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      height: 100%;
+    }
+    .wisher-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+    .wisher-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 1.4rem;
+    }
+    .wisher-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-dark);
+      margin: 0;
+    }
+    .wisher-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .wisher-body {
+      font-size: 0.86rem;
+      color: #334155;
+      line-height: 1.6;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    .ai-insights-hero {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+      box-shadow: 0 10px 20px rgba(49, 46, 129, 0.15);
+    }
+
+    /* Robot Animations */
+    @keyframes robotFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes robotWave {
+      0% { transform: rotate(0deg); }
+      10% { transform: rotate(14deg); }
+      20% { transform: rotate(-8deg); }
+      30% { transform: rotate(14deg); }
+      40% { transform: rotate(-4deg); }
+      50% { transform: rotate(10deg); }
+      60% { transform: rotate(0deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 4px 10px rgba(79, 70, 229, 0.1); }
+      50% { box-shadow: 0 8px 30px rgba(79, 70, 229, 0.25); }
+    }
+    .robot-panel {
+      animation: fadeSlideUp 0.6s ease-out forwards, pulseGlow 3s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+    .robot-panel::before {
+      content: '✨';
+      position: absolute;
+      top: 12px; left: 16px;
+      font-size: 1.2rem;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+    .robot-panel::after {
+      content: '💡';
+      position: absolute;
+      bottom: 14px; right: 18px;
+      font-size: 1.1rem;
+      animation: sparkle 2.5s ease-in-out infinite 0.5s;
+    }
+    .robot-img {
+      animation: robotFloat 3s ease-in-out infinite;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .robot-img:hover {
+      animation: robotWave 1.2s ease-in-out;
+    }
+    .robot-greeting {
+      position: absolute;
+      top: 8px; right: 14px;
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 16px 16px 0 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      animation: fadeSlideUp 0.8s ease-out 0.3s both;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+      z-index: 10;
+    }
+    .wisher-card-anim {
+      animation: fadeSlideUp 0.7s ease-out 0.2s both;
+    }
+    .insight-card-anim {
+      animation: fadeSlideUp 0.5s ease-out both;
+    }
+  </style>
+</head>
+<body class="theme-invest">
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- Profile Chip -->
+<a href="{{ url_for('profile_page') }}" class="profile-chip-global" title="View Profile">
+  <div class="profile-chip-avatar">{{ user_name[0]|upper if user_name else 'A' }}</div>
+  <div class="profile-chip-info">
+    <span class="profile-chip-name">{{ user_name if user_name else 'Arjun Mehta' }}</span>
+  </div>
+</a>
+
+<button class="floating-hamburger" id="sidebar-toggle-btn" type="button" title="Toggle Sidebar Menu">
+  <i class="bi bi-list"></i>
+</button>
+
+<div class="d-flex">
+
+  <!-- Left Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-row">
+      <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="FinSight Logo" class="dash-nav-logo-img" style="width:42px;height:42px;">
+      <div class="logo-text">
+        <h3>FinSight</h3>
+        <small>Smart. Secure. Simple.</small>
+      </div>
+    </div>
+    <nav class="nav-list">
+      <a href="{{ url_for('dashboard') }}" class="nav-item"><i class="bi bi-grid"></i><span>Dashboard</span></a>
+      <a href="{{ url_for('finances') }}" class="nav-item"><i class="bi bi-wallet2"></i><span>Finances</span></a>
+      <a href="{{ url_for('add_investment') }}" class="nav-item"><i class="bi bi-graph-up-arrow"></i><span>Investments</span></a>
+      <a href="{{ url_for('goals_list') }}" class="nav-item"><i class="bi bi-flag"></i><span>Goals</span></a>
+      <a href="{{ url_for('health_score_page') }}" class="nav-item"><i class="bi bi-heart-pulse"></i><span>Health Score</span></a>
+      <a href="{{ url_for('transactions_page') }}" class="nav-item"><i class="bi bi-arrow-left-right"></i><span>Transactions</span></a>
+      <a href="{{ url_for('ai_insights') }}" class="nav-item active"><i class="bi bi-robot"></i><span>AI Insights</span></a>
+      <a href="{{ url_for('profile_page') }}" class="nav-item"><i class="bi bi-person-circle"></i><span>Profile</span></a>
+    </nav>
+    
+    <button class="sidebar-reset-btn" id="sidebar-reset-btn" type="button" onclick="if(confirm('Are you sure you want to reset all data to 0?')) { fetch('/api/reset-data', {method: 'POST'}).then(() => { window.location.href='/dashboard'; }); }" title="Reset all data to 0">
+      <i class="bi bi-trash"></i><span>Reset Data</span>
+    </button>
+    <a href="{{ url_for('logout') }}" class="sidebar-logout-btn" title="Logout from session">
+      <i class="bi bi-box-arrow-right"></i><span>Logout</span>
+    </a>
+  </aside>
+
+  <!-- Main Panel -->
+  <main class="main-panel">
+    <div class="content-stack">
+
+      <!-- Page Hero -->
+      <div class="page-hero ai-insights-hero">
+        <div class="hero-left">
+          <div class="hero-icon-wrap dash-icon-wrap" style="background: rgba(255,255,255,0.15);">
+            <i class="bi bi-robot text-white"></i>
+          </div>
+          <div>
+            <h1 class="hero-title text-white">AI Insights</h1>
+            <p class="hero-subtitle text-white-50">Spending pattern analysis and dynamic financial guidance from your well-wisher</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Row: Robot Image on left, Anya letter on right -->
+      <div class="row g-4 mt-2">
+        <div class="col-lg-4 col-md-5">
+          <div class="panel text-center robot-panel" style="background: white; padding: 24px; border-radius: var(--border-radius-card); box-shadow: var(--shadow); border-top: 4px solid #4F46E5; display: flex; align-items: center; justify-content: center; height: 100%;">
+            <div class="robot-greeting">👋 Hi {{ user_name }}!</div>
+            <img src="{{ url_for('static', filename='images/ai_character.png') }}" alt="Anya AI" class="img-fluid robot-img" style="border-radius: 16px; width: 100%; max-height: 280px; object-fit: contain;">
+          </div>
+        </div>
+        <div class="col-lg-8 col-md-7">
+          <div class="wisher-card wisher-card-anim" style="height: 100%; border-top: 4px solid #4F46E5; display: flex; flex-direction: column;">
+            <div class="wisher-header" style="margin-bottom: 12px; padding-bottom: 8px;">
+              <div class="wisher-avatar">
+                <i class="bi bi-chat-heart-fill"></i>
+              </div>
+              <div>
+                <h4 class="wisher-name">Anya, Your AI Well-Wisher</h4>
+                <p class="wisher-subtitle">Dynamic financial counselor &amp; advisor</p>
+              </div>
+            </div>
+            <div class="wisher-body" style="max-height: 220px; overflow-y: auto;">
+              {{ letter | replace('\n', '<br>') | safe }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Spending Pattern Analysis (4 cards full width) -->
+      <div class="row g-4 mt-1">
+        <div class="col-12">
+          <div class="panel" style="border-top: 4px solid #4F46E5; background: white; padding: 24px; border-radius: var(--border-radius-card); box-shadow: var(--shadow);">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 style="font-weight: 800; color: var(--text-dark); margin: 0;">Spending Pattern Analysis</h4>
+              <select class="form-select form-select-sm" style="width: auto; border-radius: 8px;">
+                <option selected>This Month</option>
+                <option>Last Month</option>
+              </select>
+            </div>
+
+            <div class="insights-grid">
+              {% for card in insights %}
+                <div class="insight-card insight-card-anim" style="animation-delay: {{ loop.index0 * 0.12 }}s;">
+                  <div class="insight-icon-wrap" style="background: {{ card.color }}1a; color: {{ card.color }}; border-radius: 50%; display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0;">
+                    <i class="bi {{ card.icon }}" style="font-size: 1.25rem;"></i>
+                  </div>
+                  <div>
+                    <div class="insight-title" style="font-weight: 800; color: var(--text-dark); font-size: 0.95rem; margin-bottom: 4px;">{{ card.title }}</div>
+                    <div class="insight-text" style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">{{ card.text }}</div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            <div class="text-center mt-4">
+              <button onclick="window.location.reload();" class="btn btn-primary px-4 py-2" style="border-radius: 10px; background-color: #4F46E5; border-color: #4F46E5; font-weight: 600;">
+                <i class="bi bi-arrow-clockwise me-1"></i> Generate New Insights
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/cursor.js') }}"></script>
+</body>
+</html>
